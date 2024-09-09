@@ -1,4 +1,4 @@
-package entidades;
+package entidade;
 
 import java.sql.Date;
 import java.sql.Time;
