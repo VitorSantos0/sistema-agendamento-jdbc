@@ -26,7 +26,7 @@ public class ConexaoDB {
   	      Class.forName(jdbcDriver);
   	      con = DriverManager.getConnection(url, userName, password);
   	      if(con != null) {
-  	    	  System.out.println("Conexão realizada com sucesso");
+  	    	  //System.out.println("Conexão iniciada");
   	      }
   	    } else if (con.isClosed()) {
   	      con = null;
@@ -45,7 +45,7 @@ public class ConexaoDB {
   	  if (con != null) {
   	    try {
   	      con.close();
-  	      System.out.println("Conexão encerrada");
+  	      //System.out.println("Conexão encerrada");
   	    } catch (SQLException e) {
   	    	e.printStackTrace();
   	    }

@@ -16,6 +16,8 @@ public class Agendamento {
 	private Timestamp dataHoraLancamento;
 	private Timestamp dataHoraCancelamento;
 	
+	public Agendamento() {}
+	
 	public Agendamento(int codigo, Servico servico, String nomeCliente, String telefoneCliente, String nomeProfissional,
 			Date dataServico, Time horaServico, Timestamp dataHoraLancamento, Timestamp dataHoraCancelamento) {
 		this.codigo = codigo;

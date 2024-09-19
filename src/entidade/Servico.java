@@ -8,6 +8,8 @@ public class Servico {
 	private String categoria;
 	private boolean status;
 	
+	public Servico() {}
+	
 	public Servico(int codigo,String descricao, double valor, String categoria, boolean status) {
 		this.codigo = codigo;
 		this.descricao = descricao;
@@ -37,7 +39,10 @@ public class Servico {
 	}
 
 	public void setValor(double valor) {
-		this.valor = valor;
+		if(valor > 0)
+			this.valor = valor;
+		else 
+			System.out.println("O valor deve ser maior que 0");
 	}
 
 	public String getCategoria() {

@@ -1,16 +1,28 @@
 package principal;
 
-import conexao.ConexaoDB;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import entidade.Servico;
+import entidade.dao.ServicoDAO;
 
 public class AgendamentoServicoPrincipal {
 
 	public static void main(String[] args) {
 		
-		ConexaoDB conexao = new ConexaoDB("sistema_agendamento");
+		ServicoDAO servicoDAO = new ServicoDAO();
 		
-		conexao.getConnection();
+		ArrayList<Servico> servicos = servicoDAO.selectAll();
 		
-		conexao.closeConnection();
+		System.out.println("Serviços disponiveis:");
+		
+		Scanner sc = new Scanner(System.in);
+		
+		for (Servico serv : servicos) {
+			System.out.println(serv.getDescricao());
+		}
+		
+		sc.close();
 
 	}
 

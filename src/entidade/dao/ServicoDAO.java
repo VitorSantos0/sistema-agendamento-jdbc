@@ -17,6 +17,32 @@ public class ServicoDAO {
 	public ServicoDAO() {
 		conexao = new ConexaoDB("sistema_agendamento");
 	}
+	
+	public Servico selectById(int id) {
+		Connection con = conexao.getConnection();
+		PreparedStatement stmt = null;
+		ResultSet resultSet = null;
+		Servico servico = new Servico();
+		try {
+			stmt = con.prepareStatement("SELECT * FROM servico WHERE id = ?");
+			stmt.setInt(1, id);
+			resultSet = stmt.executeQuery();
+			
+			// pegar o next do resultset 
+			
+			servico.setCodigo(resultSet.getInt("id"));
+			servico.setDescricao(resultSet.getString("descricao"));
+			servico.setCategoria(resultSet.getString("categoria"));
+			servico.setStatus(resultSet.getBoolean("status"));
+			servico.setValor(resultSet.getDouble("valor"));
+
+		} catch (SQLException ex) {
+			System.out.println("Não foi possível executar " + ex);
+		} finally {
+			conexao.closeConnection();
+		}
+		return servico;
+	}
 
 	public ArrayList<Servico> selectAll() {
 		Connection con = conexao.getConnection();
