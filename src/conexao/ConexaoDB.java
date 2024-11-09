@@ -1,55 +1,42 @@
 package conexao;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class ConexaoDB {
 
-	protected Connection con = null;
-	protected String hostName = "localhost";
-	protected String userName = "postgres";
-	protected String password = "postgres";
-  	protected String url;
-  	protected String jdbcDriver = "org.postgresql.Driver";
-  	protected String dataBaseName;
-  	protected String dataBasePrefix = "jdbc:postgresql://";
-	
-  	public ConexaoDB(String dataBaseName) {
-  		this.dataBaseName = dataBaseName;
-  		this.url = this.dataBasePrefix+this.hostName+"/"+this.dataBaseName;
-  	}
+	protected static Connection con = null;
   	
-  	public Connection getConnection() {
-  	  try {
-  	    if (con == null) {
-  	      Class.forName(jdbcDriver);
-  	      con = DriverManager.getConnection(url, userName, password);
-  	      if(con != null) {
-  	    	  //System.out.println("Conexão iniciada");
-  	      }
-  	    } else if (con.isClosed()) {
-  	      con = null;
-  	      return getConnection();
-  	    }
-  	  } catch (ClassNotFoundException e) {
-  		  System.out.println("A classe do driver do banco de dados não foi localizada, instale o driver do javapath");
-//  		  e.printStackTrace();
-  	  } catch (SQLException e) {
-  		  e.printStackTrace();
-  	  }
-  	  return con;
+  	public static Connection getConnection() {
+	  try {
+		  Class.forName("org.postgresql.Driver");
+	  FileInputStream dbConfig = new FileInputStream("db.properties");
+	  Properties properfies = new Properties();
+	  properfies.load(dbConfig);
+	  String url = properfies.getProperty("url")+properfies.getProperty("database");
+	  String user = properfies.getProperty("user");
+	  String pwd = properfies.getProperty("password");
+	      con = DriverManager.getConnection(url, user, pwd);
+	  } catch (ClassNotFoundException e) {
+		  System.out.println("A classe do driver do banco de dados não foi localizada, instale o driver do javapath");
+	  } catch (SQLException e) {
+		  System.out.println("Falha ao conectar ao banco de dados, verifique as configurações");
+	  } catch(IOException e) {
+		  System.out.println("Falha na leitura das configurações do banco de dados");
+	  }
+	  return con;
   	}
 	
-  	public void closeConnection() {
-  	  if (con != null) {
-  	    try {
-  	      con.close();
-  	      //System.out.println("Conexão encerrada");
+  	public static void closeConnection() {
+  		try {
+  	    	con.close();
   	    } catch (SQLException e) {
-  	    	e.printStackTrace();
+  	    	System.out.println("Falha ao desconectar ao banco de dados, verifique as configurações");
   	    }
-  	  }
   	}
   	
 }

@@ -1,0 +1,6 @@
+projectKey=AgendamentoDB
+serverUrl=http://localhost:9000
+serverVersion=10.7.0.96327
+dashboardUrl=http://localhost:9000/dashboard?id=AgendamentoDB
+ceTaskId=3c0e3bb2-60b6-4ddd-a48c-2d24b1b4f2c8
+ceTaskUrl=http://localhost:9000/api/ce/task?id=3c0e3bb2-60b6-4ddd-a48c-2d24b1b4f2c8

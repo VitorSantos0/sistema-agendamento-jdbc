@@ -11,33 +11,38 @@ CREATE DATABASE sistema_agendamento
 
 CREATE TABLE IF NOT EXISTS servico
 (
-    id SERIAL primary key unique,
+    id SERIAL PRIMARY KEY UNIQUE,
     descricao varchar(255) NOT NULL,
     valor numeric(9,2) NOT NULL,
     categoria varchar(255) NOT NULL,
-    status integer NOT NULL
+    ativo integer NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS cliente
+(
+    id SERIAL PRIMARY KEY UNIQUE,
+    nome varchar(255) NOT NULL,
+    cpf varchar(255),
+    endereco varchar(255),
+	telefone varchar(255)
+);
 
 CREATE TABLE IF NOT EXISTS agendamento
 (
-    id SERIAL primary key unique,
+    id SERIAL PRIMARY KEY UNIQUE,
     servico_id integer NOT NULL,
-    nome_cliente varchar(255) NOT NULL,
-    telefone_cliente varchar(20),
+    cliente_id integer NOT NULL,
     nome_profissional varchar(255),
     data_servico date NOT NULL,
     hora_servico time NOT NULL,
     data_hora_lancamento timestamp DEFAULT CURRENT_TIMESTAMP,
     data_hora_cancelamento timestamp,
-    CONSTRAINT fk_servico FOREIGN KEY (servico_id)
-        REFERENCES public.servico (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
+    CONSTRAINT fk_servico FOREIGN KEY (servico_id),
+    CONSTRAINT fk_cliente FOREIGN KEY (cliente_id)
+        REFERENCES public.servico (id)
 );
 
-
-INSERT INTO servico (descricao, valor, categoria, status) 
+INSERT INTO servico (descricao, valor, categoria, ativo) 
 VALUES ('manicure', 40, 'unha', 1),
 ('pedicure', 30, 'unha',1),
 ('corte feminino',40,'cabelo',1),
@@ -51,3 +56,6 @@ VALUES ('manicure', 40, 'unha', 1),
 ('luzes masculino',30,'cabelo',1),
 ('sobrancelha',25,'rosto',1),
 ('limpeza facial',100,'rosto',1);
+
+CREATE VIEW servicos_ativos AS
+	SELECT * FROM servico WHERE ativo = 1

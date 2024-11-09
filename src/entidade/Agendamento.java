@@ -8,8 +8,7 @@ public class Agendamento {
 	
 	private int codigo;
 	private Servico servico;
-	private String nomeCliente;
-	private String telefoneCliente;
+	private Cliente cliente;
 	private String nomeProfissional;
 	private Date dataServico;
 	private Time horaServico;
@@ -18,12 +17,11 @@ public class Agendamento {
 	
 	public Agendamento() {}
 	
-	public Agendamento(int codigo, Servico servico, String nomeCliente, String telefoneCliente, String nomeProfissional,
+	public Agendamento(int codigo, Servico servico, Cliente cliente, String nomeProfissional,
 			Date dataServico, Time horaServico, Timestamp dataHoraLancamento, Timestamp dataHoraCancelamento) {
 		this.codigo = codigo;
 		this.servico = servico;
-		this.nomeCliente = nomeCliente;
-		this.telefoneCliente = telefoneCliente;
+		this.cliente = cliente;
 		this.nomeProfissional = nomeProfissional;
 		this.dataServico = dataServico;
 		this.horaServico = horaServico;
@@ -46,21 +44,13 @@ public class Agendamento {
 	public void setServico(Servico servico) {
 		this.servico = servico;
 	}
-
-	public String getNomeCliente() {
-		return nomeCliente;
+	
+	public Cliente getCliente() {
+		return cliente;
 	}
 
-	public void setNomeCliente(String nomeCliente) {
-		this.nomeCliente = nomeCliente;
-	}
-
-	public String getTelefoneCliente() {
-		return telefoneCliente;
-	}
-
-	public void setTelefoneCliente(String telefoneCliente) {
-		this.telefoneCliente = telefoneCliente;
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 
 	public String getNomeProfissional() {

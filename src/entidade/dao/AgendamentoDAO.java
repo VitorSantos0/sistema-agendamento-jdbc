@@ -5,32 +5,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import conexao.ConexaoDB;
 import entidade.Agendamento;
+import entidade.AgendamentoDia;
+import entidade.Cliente;
 import entidade.Servico;
 
 public class AgendamentoDAO {
-
-	private ConexaoDB conexaoDB = null;
-
+	
+	private Connection conn;
+	private PreparedStatement stmt = null;
+	
 	public AgendamentoDAO() {
-		conexaoDB = new ConexaoDB("sistema_agendamento");
+		this.conn = ConexaoDB.getConnection();
 	}
 
-	public boolean insert(Agendamento agendamento, Servico servico) {
-		Connection conexao = conexaoDB.getConnection();
-		PreparedStatement stmt = null;
-		String sql = "INSERT INTO agendamento (servico_id," + "nome_cliente," + "telefone_cliente,"
-				+ "nome_profissional," + "data_servico" + "hora_servico" + "data_hora_lancamento"
+	public boolean insert(Agendamento agendamento, Servico servico, Cliente cliente) {
+		String sql = "INSERT INTO agendamento (servico_id," + "cliente_id,"
+				+ "nome_profissional," + "data_servico," + "hora_servico," + "data_hora_lancamento,"
 				+ "data_hora_cancelamento)" + "values (?,?,?,?,?,?,?,?)";
 
 		try {
-			stmt = conexao.prepareStatement(sql);
+			stmt = conn.prepareStatement(sql);
 
 			stmt.setInt(1, servico.getCodigo());
-			stmt.setString(2, agendamento.getNomeCliente());
-			stmt.setString(3, agendamento.getTelefoneCliente());
-			stmt.setString(4, agendamento.getNomeProfissional());
+			stmt.setInt(2, cliente.getCodigo());
+			stmt.setString(3, agendamento.getNomeProfissional());
 			stmt.setDate(4, agendamento.getDataServico());
 			stmt.setTime(5, agendamento.getHoraServico());
 			stmt.setTimestamp(6, agendamento.getDataHoraLancamento());
@@ -43,26 +44,21 @@ public class AgendamentoDAO {
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar" + ex);
 			return false;
-		} finally {
-			conexaoDB.closeConnection();
 		}
 
 	}
 
-	public boolean update(Agendamento agendamento, Servico servico) {
-		Connection conexao = conexaoDB.getConnection();
-		PreparedStatement stmt = null;
-		String sql = "UPDATE agendamento SET servico_id = ?," + "nome_cliente = ?," + "telefone_cliente = ?,"
+	public boolean update(Agendamento agendamento, int servico_id, int cliente_id) {
+		String sql = "UPDATE agendamento SET servico_id = ?," + "cliente_id = ?,"
 				+ "nome_profissional = ?," + "data_servico = ?" + "hora_servico = ?" + "data_hora_lancamento = ?"
 				+ "data_hora_cancelamento = ?" + "where servico_id = ?";
 
 		try {
-			stmt = conexao.prepareStatement(sql);
+			stmt = conn.prepareStatement(sql);
 
-			stmt.setInt(1, servico.getCodigo());
-			stmt.setString(2, agendamento.getNomeCliente());
-			stmt.setString(3, agendamento.getTelefoneCliente());
-			stmt.setString(4, agendamento.getNomeProfissional());
+			stmt.setInt(1, servico_id);
+			stmt.setInt(2, cliente_id);
+			stmt.setString(3, agendamento.getNomeProfissional());
 			stmt.setDate(4, agendamento.getDataServico());
 			stmt.setTime(5, agendamento.getHoraServico());
 			stmt.setTimestamp(6, agendamento.getDataHoraLancamento());
@@ -74,19 +70,15 @@ public class AgendamentoDAO {
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar " + ex);
 			return false;
-		} finally {
-			conexaoDB.closeConnection();
 		}
 
 	}
 
 	public boolean delete(Agendamento agendamento) {
-		Connection conexao = conexaoDB.getConnection();
-		PreparedStatement stmt = null;
 		String sql = "DELETE FROM agendamento where id = ?";
 
 		try {
-			stmt = conexao.prepareStatement(sql);
+			stmt = conn.prepareStatement(sql);
 
 			stmt.setInt(1, agendamento.getCodigo());
 
@@ -97,45 +89,73 @@ public class AgendamentoDAO {
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar " + ex);
 			return false;
-		} finally {
-			conexaoDB.closeConnection();
 		}
-
 	}
 
 	public ArrayList<Agendamento> selectAll() {
-		Connection con = conexaoDB.getConnection();
-		PreparedStatement stmt = null;
 		ResultSet resultado = null;
 		ArrayList<Agendamento> agendamento = new ArrayList<>();
 
 		try {
-			stmt = con.prepareStatement("SELECT * FROM agendamento");
+			stmt = conn.prepareStatement("SELECT * FROM agendamento");
 			resultado = stmt.executeQuery();
 
 			while (resultado.next()) {
 
-				ResultSet resultServico = null;
+				ResultSet resultSet = null;
 
-				stmt = con.prepareStatement("SELECT * FROM servico WHERE id = ?");
+				stmt = conn.prepareStatement("SELECT * FROM servico WHERE id = ?");
 				stmt.setInt(1, resultado.getInt("servico_id"));
-				resultServico = stmt.executeQuery();
+				resultSet = stmt.executeQuery();
 
-				Servico servico = new Servico(resultServico.getInt("id"), resultServico.getString("descricao"),
-						resultServico.getDouble("valor"), resultServico.getString("categoria"),
-						resultServico.getBoolean("status"));
+				Servico servico = new Servico(resultSet.getInt("id"), resultSet.getString("descricao"),
+						resultSet.getDouble("valor"), resultSet.getString("categoria"),
+						resultSet.getBoolean("status"));
+				
 
-				agendamento.add(new Agendamento(resultado.getInt("id"), servico, resultado.getString("nome_cliente"),
-						resultado.getString("telefone_cliente"), resultado.getString("nome_profissional"),
+				stmt = conn.prepareStatement("SELECT * FROM cliente WHERE id = ?");
+				stmt.setInt(1, resultado.getInt("cliente_id"));
+				resultSet = stmt.executeQuery();
+
+				Cliente cliente = new Cliente(resultSet.getInt("id"), resultSet.getString("nome"),
+						resultSet.getString("cpf"), resultSet.getString("endereco"),
+						resultSet.getString("telefone"));
+				
+
+				agendamento.add(new Agendamento(resultado.getInt("id"), servico, cliente,
+						resultado.getString("nome_profissional"),
 						resultado.getDate("data_servico"), resultado.getTime("hora_servico"),
 						resultado.getTimestamp("data_hora_lancamento"),
 						resultado.getTimestamp("data_hora_cancelamento")));
 			}
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar " + ex);
-		} finally {
-			conexaoDB.closeConnection();
 		}
 		return agendamento;
 	}
+	
+	public ArrayList<AgendamentoDia> selectAgendamentosDia() {
+		String sql = "SELECT serv.descricao AS descricao_servico, serv.valor AS valor_servico,"
+				+"agd.data_servico, agd.hora_servico, agd.nome_profissional, cli.nome AS nome_cliente"
+				+"FROM agendamento agd INNER JOIN servico serv ON agd.servico_id = serv.id"
+				+"INNER JOIN servico serv ON agd.cliente_id = cli.id WHERE adg.data_servico = CURRENT_DATE";
+		ResultSet resultSet = null;
+		ArrayList<AgendamentoDia> agendamento = new ArrayList<>();
+
+		try {
+			stmt = conn.prepareStatement(sql);
+			resultSet = stmt.executeQuery();
+			while (resultSet.next()) {
+				AgendamentoDia agendamentoDia = new AgendamentoDia(resultSet.getString("descricao_servico"), 
+						resultSet.getDouble("valor_servico"), resultSet.getDate("data_servico"), 
+						resultSet.getTime("hora_servico"), resultSet.getString("nome_profissional"), 
+						resultSet.getString("nome_cliente"));
+				agendamento.add(agendamentoDia);
+			}
+		} catch (SQLException ex) {
+			System.out.println("Não foi possível executar " + ex);
+		}
+		return agendamento;
+	}
+	
 }

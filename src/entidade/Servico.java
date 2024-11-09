@@ -6,16 +6,16 @@ public class Servico {
 	private String descricao;
 	private double valor;
 	private String categoria;
-	private boolean status;
+	private boolean ativo;
 	
 	public Servico() {}
 	
-	public Servico(int codigo,String descricao, double valor, String categoria, boolean status) {
+	public Servico(int codigo,String descricao, double valor, String categoria, boolean ativo) {
 		this.codigo = codigo;
 		this.descricao = descricao;
 		this.valor = valor;
 		this.categoria = categoria;
-		this.status = status;
+		this.ativo = ativo;
 	}
 	
 	public int getCodigo() {
@@ -53,12 +53,12 @@ public class Servico {
 		this.categoria = categoria;
 	}
 
-	public boolean isStatus() {
-		return status;
+	public boolean isAtivo() {
+		return ativo;
 	}
 
-	public void setStatus(boolean status) {
-		this.status = status;
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 	
 }
