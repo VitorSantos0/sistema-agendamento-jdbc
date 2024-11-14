@@ -1,14 +1,3 @@
-CREATE DATABASE sistema_agendamento
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'Portuguese_Brazil.1252'
-    LC_CTYPE = 'Portuguese_Brazil.1252'
-    LOCALE_PROVIDER = 'libc'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-
 CREATE TABLE IF NOT EXISTS servico
 (
     id SERIAL PRIMARY KEY UNIQUE,
@@ -37,9 +26,8 @@ CREATE TABLE IF NOT EXISTS agendamento
     hora_servico time NOT NULL,
     data_hora_lancamento timestamp DEFAULT CURRENT_TIMESTAMP,
     data_hora_cancelamento timestamp,
-    CONSTRAINT fk_servico FOREIGN KEY (servico_id),
-    CONSTRAINT fk_cliente FOREIGN KEY (cliente_id)
-        REFERENCES public.servico (id)
+    CONSTRAINT fk_servico FOREIGN KEY (servico_id) REFERENCES servico (id),
+    CONSTRAINT fk_cliente FOREIGN KEY (cliente_id) REFERENCES cliente (id)
 );
 
 INSERT INTO servico (descricao, valor, categoria, ativo) 
@@ -58,4 +46,4 @@ VALUES ('manicure', 40, 'unha', 1),
 ('limpeza facial',100,'rosto',1);
 
 CREATE VIEW servicos_ativos AS
-	SELECT * FROM servico WHERE ativo = 1
+	SELECT * FROM servico WHERE ativo = 1;
