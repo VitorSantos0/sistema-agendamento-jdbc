@@ -47,3 +47,15 @@ VALUES ('manicure', 40, 'unha', 1),
 
 CREATE VIEW servicos_ativos AS
 	SELECT * FROM servico WHERE ativo = 1;
+
+CREATE OR REPLACE FUNCTION quantidade_agendamentos_dia() RETURNS integer
+LANGUAGE plpgsql
+AS $$
+	DECLARE
+		qtdAgendamentos integer;
+	BEGIN
+		SELECT COUNT(id) INTO qtdAgendamentos FROM agendamento 
+		WHERE data_servico = CURRENT_DATE;
+		RETURN qtdAgendamentos;
+	END
+$$;
