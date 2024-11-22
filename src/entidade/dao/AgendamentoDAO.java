@@ -51,7 +51,7 @@ public class AgendamentoDAO {
 	
 	public boolean updateCancelamento(Timestamp dataHoraCancelamento, int codigo) {
 		String query = "UPDATE agendamento SET data_hora_cancelamento = "+dataHoraCancelamento+" WHERE id = "+codigo;
-		LogSql.exibirSql(query);
+		LogSql.exibirComandoSql(query);
 		try {
 			stmt = conn.prepareStatement(query);
 			stmt.executeUpdate();

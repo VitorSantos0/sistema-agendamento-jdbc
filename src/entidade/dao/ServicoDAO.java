@@ -23,7 +23,7 @@ public class ServicoDAO {
 		ResultSet resultSet = null;
 		Servico servico = new Servico();
 		String sql = "SELECT * FROM servico WHERE id = "+id;
-		LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 			resultSet = stmt.executeQuery();
@@ -43,7 +43,7 @@ public class ServicoDAO {
 	public boolean desativarServico(int id) {
 		
 		String sql = "update servico set ativo = 0 WHERE id = "+id;
-		LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 
@@ -59,7 +59,7 @@ public class ServicoDAO {
 	
 	public boolean ativarServico(int id) {
 		String sql = "update servico set ativo = 1 WHERE id = "+id;
-		LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 
@@ -78,7 +78,7 @@ public class ServicoDAO {
 		ResultSet resultado = null;
 		ArrayList<Servico> servicos = new ArrayList<>();
 		String sql = "SELECT * FROM servico";
-		LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			
 			stmt = conn.prepareStatement(sql);
@@ -100,7 +100,7 @@ public class ServicoDAO {
 		ResultSet resultado = null;
 		ArrayList<Servico> servicos = new ArrayList<>();
 		String sql = "SELECT * FROM servicos_ativos";
-		LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 			resultado = stmt.executeQuery();

@@ -23,7 +23,7 @@ public class ClienteDAO {
 		Cliente cliente = new Cliente();
 		try {
 			String query = "SELECT * FROM cliente WHERE id = "+id;
-			LogSql.exibirSql(query);
+			LogSql.exibirComandoSql(query);
 			stmt = conn.prepareStatement(query);
 			resultSet = stmt.executeQuery();
 			if(resultSet.next()) {
@@ -45,7 +45,7 @@ public class ClienteDAO {
 
 		try {
 			String query = "SELECT * FROM cliente";
-			//LogSql.exibirSql(query);
+			LogSql.exibirComandoSql(query);
 			stmt = conn.prepareStatement(query);
 			resultado = stmt.executeQuery();
 
@@ -62,7 +62,7 @@ public class ClienteDAO {
 	
 	public boolean insertId(Cliente cliente) {
 		String sql = "INSERT INTO cliente (id, nome, cpf, endereco, telefone) VALUES (?,?,?,?,?)";
-		//LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 
@@ -85,7 +85,7 @@ public class ClienteDAO {
 	
 	public boolean insert(Cliente cliente) {
 		String sql = "INSERT INTO cliente (nome, cpf, endereco, telefone) VALUES (?,?,?,?)";
-		//LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 			
@@ -108,7 +108,7 @@ public class ClienteDAO {
 	public boolean update(String chave, String valor, int codigo) {
 		try {
 			String sql = "UPDATE cliente SET "+chave+" = '"+valor+"' WHERE id = "+codigo;
-			//LogSql.exibirSql(sql);
+			LogSql.exibirComandoSql(sql);
 			stmt = conn.prepareStatement(sql);
 			stmt.executeUpdate();
 			System.out.println("Registro atualizado com sucesso");
@@ -123,7 +123,7 @@ public class ClienteDAO {
 	public boolean updateAll(Cliente cliente) {
 		String sql = "UPDATE cliente SET id = ?, nome = ?, cpf = ?," 
 				+ "endereco = ?, telefone = ? WHERE id = "+cliente.getCodigo();
-		//LogSql.exibirSql(sql);
+		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 
@@ -146,7 +146,7 @@ public class ClienteDAO {
 	public boolean delete(int id) {
 		try {
 			String sql = "DELETE FROM cliente WHERE id = "+id;
-			//LogSql.exibirSql(sql);
+			LogSql.exibirComandoSql(sql);
 			stmt = conn.prepareStatement(sql);
 			stmt.executeUpdate();
 			

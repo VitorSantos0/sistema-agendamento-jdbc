@@ -63,7 +63,7 @@ public class Servico {
 	
 	@Override
 	public String toString() {
-		return "Serviço: "+this.getDescricao().toUpperCase()+" | Valor: R$"+this.getValor();
+		return "Código: "+this.getCodigo()+" | Serviço: "+this.getDescricao().toUpperCase()+" | Valor: R$"+this.getValor();
 	}
 	
 }

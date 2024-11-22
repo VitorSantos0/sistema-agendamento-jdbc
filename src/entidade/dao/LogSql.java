@@ -2,11 +2,18 @@ package entidade.dao;
 
 public class LogSql {
 	
-	public static void exibirSql(String sql)
-	{
-		System.out.println("\n------------------------------- SQL -------------------------------");
-		System.out.println("\t"+sql);
-		System.out.println("------------------------------- SQL -------------------------------\n");
+	private static boolean mostrarSql;
+	
+	public static void exibicao(boolean ativa) {
+		mostrarSql = ativa;
+    }
+
+	public static void exibirComandoSql(String sql){
+		if(mostrarSql) {			
+			System.out.println("------------------------------- SQL -------------------------------");
+			System.out.println("\t"+sql);
+			System.out.println("------------------------------- SQL -------------------------------\n");
+		}
 	}
 
 }

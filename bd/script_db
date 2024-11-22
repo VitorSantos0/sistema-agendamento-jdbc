@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS cliente
 (
     id SERIAL PRIMARY KEY UNIQUE,
     nome varchar(255) NOT NULL,
-    cpf varchar(255),
+    cpf varchar(255) NOT NULL,
     endereco varchar(255),
 	telefone varchar(255)
 );
@@ -40,10 +40,10 @@ VALUES ('manicure', 40, 'unha', 1),
 ('depilação a laser',130,'depilação',0),
 ('depilação de cera',50,'depilação',0),
 ('escovação e prancha',80,'cabelo',1),
-('luzes feminino',120,'cabelo',1),
+('luzes feminino',120,'cabelo',0),
 ('luzes masculino',30,'cabelo',1),
 ('sobrancelha',25,'rosto',1),
-('limpeza facial',100,'rosto',1);
+('limpeza facial',100,'rosto',0);
 
 CREATE VIEW servicos_ativos AS
 	SELECT * FROM servico WHERE ativo = 1;

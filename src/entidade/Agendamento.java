@@ -95,7 +95,7 @@ public class Agendamento {
 	
 	@Override
 	public String toString() {
-		return "Cliente: "+this.getCliente().getNome()+" | Serviço: "+this.getServico().getDescricao()
+		return "Código: "+this.getCodigo()+"| Cliente: "+this.getCliente().getNome()+" | Serviço: "+this.getServico().getDescricao()
 				+" | Profissional: "+this.getNomeProfissional()+" | Data/Hora: "+this.getDataServico()+" às "+this.getHoraServico();
 	}
 	
