@@ -61,4 +61,9 @@ public class Servico {
 		this.ativo = ativo;
 	}
 	
+	@Override
+	public String toString() {
+		return "Serviço: "+this.getDescricao().toUpperCase()+" | Valor: R$"+this.getValor();
+	}
+	
 }

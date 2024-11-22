@@ -22,16 +22,17 @@ public class ClienteDAO {
 		ResultSet resultSet = null;
 		Cliente cliente = new Cliente();
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM cliente WHERE id = ?");
-			stmt.setInt(1, id);
+			String query = "SELECT * FROM cliente WHERE id = "+id;
+			LogSql.exibirSql(query);
+			stmt = conn.prepareStatement(query);
 			resultSet = stmt.executeQuery();
-			
-			cliente.setCodigo(resultSet.getInt("id"));
-			cliente.setNome(resultSet.getString("nome"));
-			cliente.setCpf(resultSet.getString("cpf"));
-			cliente.setEndereco(resultSet.getString("endereco"));
-			cliente.setTelefone(resultSet.getString("telefone"));
-
+			if(resultSet.next()) {
+				cliente.setCodigo(resultSet.getInt("id"));
+				cliente.setNome(resultSet.getString("nome"));
+				cliente.setCpf(resultSet.getString("cpf"));
+				cliente.setEndereco(resultSet.getString("endereco"));
+				cliente.setTelefone(resultSet.getString("telefone"));
+			}
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar " + ex);
 		}
@@ -43,7 +44,9 @@ public class ClienteDAO {
 		ArrayList<Cliente> cliente = new ArrayList<>();
 
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM cliente");
+			String query = "SELECT * FROM cliente";
+			//LogSql.exibirSql(query);
+			stmt = conn.prepareStatement(query);
 			resultado = stmt.executeQuery();
 
 			while (resultado.next()) {
@@ -59,7 +62,7 @@ public class ClienteDAO {
 	
 	public boolean insertId(Cliente cliente) {
 		String sql = "INSERT INTO cliente (id, nome, cpf, endereco, telefone) VALUES (?,?,?,?,?)";
-
+		//LogSql.exibirSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 
@@ -82,7 +85,7 @@ public class ClienteDAO {
 	
 	public boolean insert(Cliente cliente) {
 		String sql = "INSERT INTO cliente (nome, cpf, endereco, telefone) VALUES (?,?,?,?)";
-
+		//LogSql.exibirSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 			
@@ -102,10 +105,25 @@ public class ClienteDAO {
 
 	}
 
-	public boolean update(Cliente cliente) {
-		String sql = "UPDATE cliente SET id = ?," + "nome = ?,"
-				+ "cpf = ?," + "endereco = ?" + "telefone = ?";
+	public boolean update(String chave, String valor, int codigo) {
+		try {
+			String sql = "UPDATE cliente SET "+chave+" = '"+valor+"' WHERE id = "+codigo;
+			//LogSql.exibirSql(sql);
+			stmt = conn.prepareStatement(sql);
+			stmt.executeUpdate();
+			System.out.println("Registro atualizado com sucesso");
+			return true;
+		} catch (SQLException ex) {
+			System.out.println("Não foi possível executar " + ex);
+			return false;
+		}
 
+	}
+	
+	public boolean updateAll(Cliente cliente) {
+		String sql = "UPDATE cliente SET id = ?, nome = ?, cpf = ?," 
+				+ "endereco = ?, telefone = ? WHERE id = "+cliente.getCodigo();
+		//LogSql.exibirSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
 
@@ -116,7 +134,7 @@ public class ClienteDAO {
 			stmt.setString(5, cliente.getTelefone());
 
 			stmt.executeUpdate();
-			System.out.println("Registro alterados com sucesso");
+			System.out.println("Registro atualizado com sucesso");
 			return true;
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar " + ex);
@@ -125,16 +143,14 @@ public class ClienteDAO {
 
 	}
 
-	public boolean delete(Cliente cliente) {
-		String sql = "DELETE FROM cliente where id = ?";
-
+	public boolean delete(int id) {
 		try {
+			String sql = "DELETE FROM cliente WHERE id = "+id;
+			//LogSql.exibirSql(sql);
 			stmt = conn.prepareStatement(sql);
-
-			stmt.setInt(1, cliente.getCodigo());
-
 			stmt.executeUpdate();
-			System.out.println("Registro alterados com sucesso");
+			
+			System.out.println("Registro apagado com sucesso");
 			return true;
 
 		} catch (SQLException ex) {

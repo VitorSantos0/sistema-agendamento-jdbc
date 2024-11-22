@@ -33,7 +33,8 @@ public class ConexaoDB {
 	
   	public static void closeConnection() {
   		try {
-  	    	con.close();
+  			if(con != null)
+  				con.close();
   	    } catch (SQLException e) {
   	    	System.out.println("Falha ao desconectar ao banco de dados, verifique as configurações");
   	    }

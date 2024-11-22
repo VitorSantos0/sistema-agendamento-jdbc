@@ -13,18 +13,19 @@ import conexao.ConexaoDB;
 public class ServicoDAO {
 	
 	private Connection conn;
+	private PreparedStatement stmt = null;
 	
 	public ServicoDAO() {
 		this.conn = ConexaoDB.getConnection();
 	}
 	
 	public Servico selectById(int id) {
-		PreparedStatement stmt = null;
 		ResultSet resultSet = null;
 		Servico servico = new Servico();
+		String sql = "SELECT * FROM servico WHERE id = "+id;
+		LogSql.exibirSql(sql);
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM servico WHERE id = ?");
-			stmt.setInt(1, id);
+			stmt = conn.prepareStatement(sql);
 			resultSet = stmt.executeQuery();
 			
 			servico.setCodigo(resultSet.getInt("id"));
@@ -38,14 +39,49 @@ public class ServicoDAO {
 		}
 		return servico;
 	}
+	
+	public boolean desativarServico(int id) {
+		
+		String sql = "update servico set ativo = 0 WHERE id = "+id;
+		LogSql.exibirSql(sql);
+		try {
+			stmt = conn.prepareStatement(sql);
+
+			stmt.executeUpdate();
+			System.out.println("Serviço desativado com sucesso");
+			return true;
+
+		} catch (SQLException ex) {
+			System.out.println("Não foi possível executar " + ex);
+			return false;
+		}
+	}
+	
+	public boolean ativarServico(int id) {
+		String sql = "update servico set ativo = 1 WHERE id = "+id;
+		LogSql.exibirSql(sql);
+		try {
+			stmt = conn.prepareStatement(sql);
+
+			stmt.executeUpdate();
+			System.out.println("Serviço ativado com sucesso");
+			return true;
+
+		} catch (SQLException ex) {
+			System.out.println("Não foi possível executar " + ex);
+			return false;
+		}
+	}
+
 
 	public ArrayList<Servico> selectAll() {
-		PreparedStatement stmt = null;
 		ResultSet resultado = null;
 		ArrayList<Servico> servicos = new ArrayList<>();
-
+		String sql = "SELECT * FROM servico";
+		LogSql.exibirSql(sql);
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM servico");
+			
+			stmt = conn.prepareStatement(sql);
 			resultado = stmt.executeQuery();
 
 			while (resultado.next()) {
@@ -63,9 +99,10 @@ public class ServicoDAO {
 		PreparedStatement stmt = null;
 		ResultSet resultado = null;
 		ArrayList<Servico> servicos = new ArrayList<>();
-
+		String sql = "SELECT * FROM servicos_ativos";
+		LogSql.exibirSql(sql);
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM servicos_ativos");
+			stmt = conn.prepareStatement(sql);
 			resultado = stmt.executeQuery();
 
 			while (resultado.next()) {

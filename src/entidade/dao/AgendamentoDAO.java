@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import conexao.ConexaoDB;
@@ -47,8 +48,23 @@ public class AgendamentoDAO {
 		}
 
 	}
+	
+	public boolean updateCancelamento(Timestamp dataHoraCancelamento, int codigo) {
+		String query = "UPDATE agendamento SET data_hora_cancelamento = "+dataHoraCancelamento+" WHERE id = "+codigo;
+		LogSql.exibirSql(query);
+		try {
+			stmt = conn.prepareStatement(query);
+			stmt.executeUpdate();
+			System.out.println("Registro cancelado com sucesso");
+			return true;
+		} catch (SQLException ex) {
+			System.out.println("Não foi possível executar " + ex);
+			return false;
+		}
 
-	public boolean update(Agendamento agendamento, int servico_id, int cliente_id) {
+	}
+
+	public boolean updateAll(Agendamento agendamento, int servico_id, int cliente_id) {
 		String sql = "UPDATE agendamento SET servico_id = ?," + "cliente_id = ?,"
 				+ "nome_profissional = ?," + "data_servico = ?" + "hora_servico = ?" + "data_hora_lancamento = ?"
 				+ "data_hora_cancelamento = ?" + "where servico_id = ?";
@@ -138,7 +154,7 @@ public class AgendamentoDAO {
 		String sql = "SELECT serv.descricao AS descricao_servico, serv.valor AS valor_servico,"
 				+"agd.data_servico, agd.hora_servico, agd.nome_profissional, cli.nome AS nome_cliente"
 				+"FROM agendamento agd INNER JOIN servico serv ON agd.servico_id = serv.id"
-				+"INNER JOIN servico serv ON agd.cliente_id = cli.id WHERE adg.data_servico = CURRENT_DATE";
+				+"INNER JOIN cliente cli ON agd.cliente_id = cli.id WHERE agd.data_servico = CURRENT_DATE";
 		ResultSet resultSet = null;
 		ArrayList<AgendamentoDia> agendamento = new ArrayList<>();
 
@@ -156,6 +172,37 @@ public class AgendamentoDAO {
 			System.out.println("Não foi possível executar " + ex);
 		}
 		return agendamento;
+	}
+	
+	public ArrayList<Agendamento> selectByClienteDia(int clienteId) {
+		ResultSet resultado = null;
+		ArrayList<Agendamento> agendamentos = new ArrayList<>();
+		String query = "SELECT * FROM agendamento "
+				+ "WHERE cliente_id = "+clienteId+" AND data_servico >= CURRENT_DATE"
+				+ " AND hora_servico >= CURRENT_TIME";
+		try {
+			stmt = conn.prepareStatement(query);
+			resultado = stmt.executeQuery();
+			while (resultado.next()) { 
+				
+				ServicoDAO servicoDAO = new ServicoDAO();
+				Servico servico =  servicoDAO.selectById(resultado.getInt("servico_id"));
+				
+				ClienteDAO clienteDAO = new ClienteDAO();
+				Cliente cliente = clienteDAO.selectById(resultado.getInt("cliente_id"));
+			
+				Agendamento agendamento = new Agendamento(resultado.getInt("id"), servico, cliente,
+						resultado.getString("nome_profissional"),
+						resultado.getDate("data_servico"), 
+						resultado.getTime("hora_servico"),
+						resultado.getTimestamp("data_hora_lancamento"),
+						resultado.getTimestamp("data_hora_cancelamento"));
+				agendamentos.add(agendamento);
+			}
+		} catch (SQLException ex) {
+			System.out.println("Não foi possível executar " + ex);
+		}
+		return agendamentos;
 	}
 	
 }
