@@ -34,7 +34,7 @@ public class ClienteDAO {
 				cliente.setTelefone(resultSet.getString("telefone"));
 			}
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 		}
 		return cliente;
 	}
@@ -55,7 +55,7 @@ public class ClienteDAO {
 						resultado.getString("telefone")));
 			}
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 		} 
 		return cliente;
 	}
@@ -71,13 +71,13 @@ public class ClienteDAO {
 			stmt.setString(3, cliente.getCpf());
 			stmt.setString(4, cliente.getEndereco());
 			stmt.setString(5, cliente.getTelefone());
-
+			
 			stmt.executeUpdate();
 
 			System.out.println("Registro salvo com sucesso");
 			return true;
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar" + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 			return false;
 		}
 
@@ -85,7 +85,7 @@ public class ClienteDAO {
 	
 	public boolean insert(Cliente cliente) {
 		String sql = "INSERT INTO cliente (nome, cpf, endereco, telefone) VALUES (?,?,?,?)";
-		LogSql.exibirComandoSql(sql);
+		
 		try {
 			stmt = conn.prepareStatement(sql);
 			
@@ -93,13 +93,22 @@ public class ClienteDAO {
 			stmt.setString(2, cliente.getCpf());
 			stmt.setString(3, cliente.getEndereco());
 			stmt.setString(4, cliente.getTelefone());
+			
+
+			String executedSQL = sql
+	                .replaceFirst("\\?", "'"+cliente.getNome()+"'")
+	                .replaceFirst("\\?", "'"+cliente.getCpf()+"'")
+					.replaceFirst("\\?", "'"+cliente.getEndereco()+"'")
+					.replaceFirst("\\?", "'"+cliente.getTelefone()+"'");
+			
+			LogSql.exibirComandoSql(executedSQL);
 
 			stmt.executeUpdate();
 
 			System.out.println("Registro salvo com sucesso");
 			return true;
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar" + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 			return false;
 		}
 
@@ -114,30 +123,7 @@ public class ClienteDAO {
 			System.out.println("Registro atualizado com sucesso");
 			return true;
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
-			return false;
-		}
-
-	}
-	
-	public boolean updateAll(Cliente cliente) {
-		String sql = "UPDATE cliente SET id = ?, nome = ?, cpf = ?," 
-				+ "endereco = ?, telefone = ? WHERE id = "+cliente.getCodigo();
-		LogSql.exibirComandoSql(sql);
-		try {
-			stmt = conn.prepareStatement(sql);
-
-			stmt.setInt(1, cliente.getCodigo());
-			stmt.setString(2, cliente.getNome());
-			stmt.setString(3, cliente.getCpf());
-			stmt.setString(4, cliente.getEndereco());
-			stmt.setString(5, cliente.getTelefone());
-
-			stmt.executeUpdate();
-			System.out.println("Registro atualizado com sucesso");
-			return true;
-		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 			return false;
 		}
 
@@ -154,7 +140,7 @@ public class ClienteDAO {
 			return true;
 
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 			return false;
 		}
 	}

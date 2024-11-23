@@ -2,6 +2,7 @@ package entidade;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 
 public class AgendamentoDia {
 	
@@ -70,5 +71,18 @@ public class AgendamentoDia {
 		this.nome_cliente = nome_cliente;
 	}
 	
+	@Override
+	public String toString() {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		String dataAgendamento = formatter.format(this.getData_servico());
+		formatter = new SimpleDateFormat("hh:mm a");
+		String horaAgendamento = formatter.format(this.getHora_servico());
+		return "Serviço: "+this.getDescricao_servico()
+		+" | Valor: "+this.getValor_servico()
+		+" | Cliente: "+this.getNome_cliente()
+		+" | Profissional: "+this.getNome_profissional()
+		+" | Data: "+dataAgendamento
+		+" | Hora: "+horaAgendamento;
+	}
 
 }

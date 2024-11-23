@@ -1,11 +1,19 @@
 package principal;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import conexao.ConexaoDB;
 import entidade.Agendamento;
+import entidade.AgendamentoDia;
 import entidade.Cliente;
 import entidade.Servico;
 import entidade.dao.AgendamentoDAO;
@@ -22,6 +30,7 @@ public class AgendamentoServicoPrincipal {
 		exibirMenuPrincipal();
 		
 		ConexaoDB.closeConnection();
+		sc.close();
 
 	}
 	
@@ -36,8 +45,12 @@ public class AgendamentoServicoPrincipal {
             System.out.println("[0] - Encerrar");
             System.out.print("Escolha a entidade que deseja manipular: ");
             String opcao = sc.nextLine();
-            System.out.print("Digite 1 para exibir os comandos SQL execuados: ");
-            LogSql.exibicao(sc.nextLine().equals("1"));
+            
+            if(!opcao.equals("0")) {
+            	 System.out.print("Digite 1 para exibir os comandos SQL executados: ");
+                 LogSql.exibicao(sc.nextLine().equals("1"));
+            }
+           
             switch (opcao) {
                 case "1":
                 	exibirSubmenuServico();
@@ -46,7 +59,7 @@ public class AgendamentoServicoPrincipal {
                     exibirSubmenuCliente();
                     break;
                 case "3":
-                    System.out.println("\nEm desenvolvimento...");
+                    exibirSubmenuAgendamento();
                     break;
                 case "0":
                     System.out.println("\nEncerrando o programa...");
@@ -63,8 +76,7 @@ public class AgendamentoServicoPrincipal {
             listarServicosDisponiveis();
             System.out.println("[1] - Ativar");
             System.out.println("[2] - Desativar");
-            System.out.println("[3] - Visualizar por ID");
-            System.out.println("[4] - Visualizar todos");
+            System.out.println("[3] - Visualizar todos");
             System.out.println("[0] - Voltar");
             System.out.print("Escolha uma opção: ");
             String opcao = sc.nextLine();
@@ -77,9 +89,6 @@ public class AgendamentoServicoPrincipal {
                 	desativarServico();
                     break;
                 case "3":
-                	visualizarServicoID();
-                    break;
-                case "4":
                 	visualizarServico();
                     break;
                 case "0":
@@ -117,6 +126,219 @@ public class AgendamentoServicoPrincipal {
                     System.out.println("Opção inválida, tente novamente.");
             }
         }
+	}
+	
+	public static void exibirSubmenuAgendamento() {
+		while (true) {
+            System.out.println("\n================== SUBMENU AGENDAMENTO ==================\n");
+            listarAgendamentosDia();
+            exibirQuantidadeAgendamentosDia();
+            System.out.println("[1] - Cadastrar");
+            System.out.println("[2] - Editar");
+            System.out.println("[3] - Cancelar");
+            System.out.println("[4] - Exibir todos os agendamentos");
+            System.out.println("[0] - Voltar");
+            System.out.print("Escolha uma opção: ");
+            String opcao = sc.nextLine();
+    		System.out.println();
+            switch (opcao) {
+                case "1":
+                	cadastrarAgendamento();
+                    break;
+                case "2":
+                	editarAgendamento();
+                    break;
+                case "3":
+                	cancelarAgendamento();
+                    break;
+                case "4":
+                	exibirTodosAgendamentos();
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opção inválida, tente novamente.");
+            }
+        }
+	}
+	
+	// MÉTODOS AGENDAMENTO 
+	
+	public static void listarAgendamentosDia() {
+		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
+		ArrayList<AgendamentoDia> agendamentos = agendamentoDAO.selectAgendamentosDia();
+		for(AgendamentoDia agenda : agendamentos) {
+			System.out.println(agenda.toString()+"\n");
+		}
+	}
+	
+	public static void exibirQuantidadeAgendamentosDia() {
+		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
+		int qtdSerivosDia = agendamentoDAO.getQuantidadeAgendamentoDia();
+		System.out.println(qtdSerivosDia+" Agendamento(s) encontrado(s) para hoje\n");
+	}
+	
+	public static void cadastrarAgendamento() {
+		listarServicosDisponiveis();
+		System.out.print("Informe o código do serviço: ");
+		int codServico = Integer.parseInt(sc.nextLine());
+		if(listarClientes()) {			
+			System.out.print("Informe o código do cliente: ");
+			int codCliente = Integer.parseInt(sc.nextLine());
+			System.out.print("Informe o nome do profissional: ");
+			String nomeProfissional = sc.nextLine();
+			System.out.print("Informe a data do serviço (Exemplo: 01/01/2025): ");
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+			boolean dataValidacao = false;
+			Date dataServico = null;
+			do {
+				String dataServicoString = sc.nextLine();
+				try {
+					java.util.Date utilDate = dateFormatter.parse(dataServicoString);
+					dataServico = new Date(utilDate.getTime());
+					dataValidacao = true;
+				} catch (ParseException e) {
+					System.err.print("\nData inválida, digite da forma correta: ");
+				}
+			} while(!dataValidacao);
+			System.out.print("Informe a hora do serviço (Exemplo: 08:00): ");
+			DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
+			boolean horaValidacao = false;
+			Time horaServico = null;
+			do {
+				String horaServicoString = sc.nextLine();
+				try {
+					LocalTime localTime = LocalTime.parse(horaServicoString, horaFormatter);
+					horaServico = Time.valueOf(localTime);
+					horaValidacao = true;
+				} catch (DateTimeParseException e) {
+					System.err.print("\nData inválida, digite da forma correta: ");
+				}
+			} while(!horaValidacao);
+			ServicoDAO servicoDAO = new ServicoDAO();
+			Servico servico = servicoDAO.selectById(codServico);
+			ClienteDAO clienteDAO = new ClienteDAO();
+			Cliente cliente = clienteDAO.selectById(codCliente);
+			AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
+			if(agendamentoDAO.selectByDataHora(dataServico, horaServico)) {
+				System.out.println("Já existe uma agendamento cadastrado na mesma data e horário.");
+			} else {
+				Agendamento agendamento = new Agendamento(servico, cliente, nomeProfissional, dataServico, horaServico);
+				agendamentoDAO.insert(agendamento);
+			}
+		}
+	}
+	
+	public static void editarAgendamento() {
+		if(exibirTodosAgendamentos()) {
+			AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
+			Agendamento agendamento = selecionarAgendamentoOperacao();
+			System.out.println("[1] - Nome do Profissional");
+			System.out.println("[2] - Data do Serviço");
+			System.out.println("[3] - Hora do Serviço");
+			System.out.println("[0] - Cancelar");
+			System.out.print("Escolha a informação a ser atualizada: ");
+			String atributos[] = {"cancelar", "nome_profissional", "data_servico", "hora_servico"};
+			String exemploFormato[] = {"", "", " (Exemplo: 01/01/2025)", " (Exemplo: 08:00)"}; 
+			int opcao = 111;
+			try {
+				opcao = Integer.parseInt(sc.nextLine());
+			} catch (NumberFormatException ignore) {}
+			while(opcao > 3 || opcao < 0) {
+				System.out.print("Informe uma opção válida: ");
+				try {
+					opcao = Integer.parseInt(sc.nextLine());
+				} catch (NumberFormatException ignore) {}
+			}
+			if(opcao != 0) {
+				String atributo = atributos[opcao].replace("_", " ");
+				String atributoComplemento = exemploFormato[opcao];
+				if(opcao != 1) {
+					atributo = atributos[opcao].replace("_", " ").replace("c", "ç");
+				}
+				System.out.print("Informe o(a) novo(a) "+atributo+" do agendamento"+atributoComplemento+": ");
+				String valor = sc.nextLine();
+				if(opcao == 2) {
+					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+					boolean dataValidacao = false;
+					Date dataServico = null;
+					do {
+			            String dataServicoString = valor;
+			            try {
+			            	java.util.Date utilDate = dateFormatter.parse(dataServicoString);
+			            	dataServico = new Date(utilDate.getTime());
+			                dataValidacao = true;
+			            } catch (ParseException e) {
+			                System.err.print("\nData inválida, digite da forma correta: ");
+			            }
+			        } while(!dataValidacao);
+					agendamentoDAO.updateData(atributos[opcao], dataServico, agendamento.getCodigo());
+				} else if (opcao == 3) {
+					DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
+					boolean horaValidacao = false;
+					Time horaServico = null;
+					do {
+			            String horaServicoString = valor;
+			            try {
+			            	LocalTime localTime = LocalTime.parse(horaServicoString, horaFormatter);
+			            	horaServico = Time.valueOf(localTime);
+			            	horaValidacao = true;
+			            } catch (DateTimeParseException e) {
+			                System.err.print("\nData inválida, digite da forma correta: ");
+			            }
+			        } while(!horaValidacao);
+					agendamentoDAO.updateHora(atributos[opcao], horaServico, agendamento.getCodigo());
+				} else {
+					agendamentoDAO.update(atributos[opcao], valor, agendamento.getCodigo());
+				}				
+			}
+		}
+	}
+	
+	public static void cancelarAgendamento() {
+
+		AgendamentoDAO agendamento = new AgendamentoDAO();
+		Timestamp dataHoraAtual = new Timestamp(System.currentTimeMillis());
+		
+		exibirTodosAgendamentos();
+		
+		System.out.print("Digite o código do agendamento que deseja cancelar: ");
+		int codigo = Integer.parseInt(sc.nextLine());
+		
+		System.out.println("Deseja realmente cancelar o agendamento? 1-Sim/0-Não ");
+		String opcao= sc.nextLine();	
+		
+		if(opcao.equals("1")) {
+			agendamento.updateCancelamento(dataHoraAtual, codigo);
+		}
+	}
+	
+	public static boolean exibirTodosAgendamentos() {
+		AgendamentoDAO agendamento = new AgendamentoDAO();
+		ArrayList<Agendamento> agendamentos = agendamento.selectAll();
+		
+		if(agendamentos.isEmpty()) {
+			System.out.println("Nenhum agendamento cadastrado\n");
+		}else {
+			for (Agendamento agend : agendamentos) {
+				System.out.println(agend.toString()+"\n");
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	public static Agendamento selecionarAgendamentoOperacao() {
+		System.out.print("Informe o código do agendamento: ");
+		int codigo = Integer.parseInt(sc.nextLine());
+		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
+		Agendamento agendamento = agendamentoDAO.selectById(codigo);
+		while(agendamento.getCodigo() == 0) {
+			System.out.print("Agendamento não identificado, informe um código válido: ");
+			codigo = Integer.parseInt(sc.nextLine());
+			agendamento = agendamentoDAO.selectById(codigo);
+		};
+		return agendamento;
 	}
 	
 	// MÉTODOS SERVIÇO

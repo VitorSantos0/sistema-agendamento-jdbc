@@ -27,7 +27,7 @@ public class ServicoDAO {
 		try {
 			stmt = conn.prepareStatement(sql);
 			resultSet = stmt.executeQuery();
-			
+			resultSet.next();
 			servico.setCodigo(resultSet.getInt("id"));
 			servico.setDescricao(resultSet.getString("descricao"));
 			servico.setCategoria(resultSet.getString("categoria"));
@@ -35,7 +35,7 @@ public class ServicoDAO {
 			servico.setValor(resultSet.getDouble("valor"));
 
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 		}
 		return servico;
 	}
@@ -52,7 +52,7 @@ public class ServicoDAO {
 			return true;
 
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 			return false;
 		}
 	}
@@ -68,7 +68,7 @@ public class ServicoDAO {
 			return true;
 
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 			return false;
 		}
 	}
@@ -90,7 +90,7 @@ public class ServicoDAO {
 						resultado.getBoolean("ativo")));
 			}
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 		} 
 		return servicos;
 	}
@@ -99,7 +99,7 @@ public class ServicoDAO {
 		PreparedStatement stmt = null;
 		ResultSet resultado = null;
 		ArrayList<Servico> servicos = new ArrayList<>();
-		String sql = "SELECT * FROM servicos_ativos";
+		String sql = "SELECT * FROM servicos_ativos_view";
 		LogSql.exibirComandoSql(sql);
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -111,7 +111,7 @@ public class ServicoDAO {
 						resultado.getBoolean("ativo")));
 			}
 		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar " + ex);
+			System.out.println("Não foi possível executar sql: " + ex);
 		} 
 		return servicos;
 	}

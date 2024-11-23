@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS agendamento
 INSERT INTO servico (descricao, valor, categoria, ativo) 
 VALUES ('manicure', 40, 'unha', 1),
 ('pedicure', 30, 'unha',1),
-('corte feminino',40,'cabelo',1),
+('corte feminino',40,'cabelo',0),
 ('corte masculino',25,'cabelo',1),
 ('corte infantil',32,'cabelo',1),
 ('barba',15,'rosto',1),
@@ -45,7 +45,7 @@ VALUES ('manicure', 40, 'unha', 1),
 ('sobrancelha',25,'rosto',1),
 ('limpeza facial',100,'rosto',0);
 
-CREATE VIEW servicos_ativos AS
+CREATE VIEW servicos_ativos_view AS
 	SELECT * FROM servico WHERE ativo = 1;
 
 CREATE OR REPLACE FUNCTION quantidade_agendamentos_dia() RETURNS integer

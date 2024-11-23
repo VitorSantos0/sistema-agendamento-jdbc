@@ -3,6 +3,7 @@ package entidade;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class Agendamento {
 	
@@ -16,6 +17,14 @@ public class Agendamento {
 	private Timestamp dataHoraCancelamento;
 	
 	public Agendamento() {}
+	
+	public Agendamento(Servico servico, Cliente cliente, String nomeProfissional, Date dataServico, Time horaServico) {
+		this.servico = servico;
+		this.cliente = cliente;
+		this.nomeProfissional = nomeProfissional;
+		this.dataServico = dataServico;
+		this.horaServico = horaServico;
+	}
 	
 	public Agendamento(int codigo, Servico servico, Cliente cliente, String nomeProfissional,
 			Date dataServico, Time horaServico, Timestamp dataHoraLancamento, Timestamp dataHoraCancelamento) {
@@ -95,8 +104,16 @@ public class Agendamento {
 	
 	@Override
 	public String toString() {
-		return "Código: "+this.getCodigo()+"| Cliente: "+this.getCliente().getNome()+" | Serviço: "+this.getServico().getDescricao()
-				+" | Profissional: "+this.getNomeProfissional()+" | Data/Hora: "+this.getDataServico()+" às "+this.getHoraServico();
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		String dataAgendamento = formatter.format(this.getDataServico());
+		formatter = new SimpleDateFormat("hh:mm a");
+		String horaAgendamento = formatter.format(this.getHoraServico());
+		return "Código: "+this.getCodigo()
+				+" | Cliente: "+this.getCliente().getNome()
+				+" | Serviço: "+this.getServico().getDescricao()
+				+" | Profissional: "+this.getNomeProfissional()
+				+" | Data: "+dataAgendamento
+				+" | Hora: "+horaAgendamento;
 	}
 	
 }

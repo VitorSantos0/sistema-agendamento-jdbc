@@ -10,9 +10,9 @@ public class LogSql {
 
 	public static void exibirComandoSql(String sql){
 		if(mostrarSql) {			
-			System.out.println("------------------------------- SQL -------------------------------");
-			System.out.println("\t"+sql);
-			System.out.println("------------------------------- SQL -------------------------------\n");
+			System.out.print("[JDBC-PGSQL]: ");
+			System.out.println(sql);
+			System.out.println();
 		}
 	}
 
