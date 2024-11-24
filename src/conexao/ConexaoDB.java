@@ -14,12 +14,12 @@ public class ConexaoDB {
   	public static Connection getConnection() {
 	  try {
 		  Class.forName("org.postgresql.Driver");
-	  FileInputStream dbConfig = new FileInputStream("db.properties");
-	  Properties properfies = new Properties();
-	  properfies.load(dbConfig);
-	  String url = properfies.getProperty("url")+properfies.getProperty("database");
-	  String user = properfies.getProperty("user");
-	  String pwd = properfies.getProperty("password");
+		  FileInputStream dbConfig = new FileInputStream("db.properties");
+		  Properties properfies = new Properties();
+		  properfies.load(dbConfig);
+		  String url = "jdbc:postgresql://"+properfies.getProperty("url")+"/"+properfies.getProperty("database");
+		  String user = properfies.getProperty("user");
+		  String pwd = properfies.getProperty("password");
 	      con = DriverManager.getConnection(url, user, pwd);
 	  } catch (ClassNotFoundException e) {
 		  System.out.println("A classe do driver do banco de dados não foi localizada, instale o driver do javapath");

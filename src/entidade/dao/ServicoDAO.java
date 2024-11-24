@@ -2,117 +2,74 @@ package entidade.dao;
 
 import entidade.Servico;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import conexao.ConexaoDB;
-
-public class ServicoDAO {
+public class ServicoDAO extends DAO {
 	
-	private Connection conn;
-	private PreparedStatement stmt = null;
+	private final String ENTIDADE = "servico";
 	
-	public ServicoDAO() {
-		this.conn = ConexaoDB.getConnection();
+	public ArrayList<Servico> select() {
+		ArrayList<Servico> servicos = new ArrayList<>();
+		try {
+			ResultSet resultado = this.select(this.ENTIDADE);
+			while(resultado.next()) {
+				servicos.add(new Servico(resultado.getInt("id"), resultado.getString("descricao"),
+						resultado.getDouble("valor"), resultado.getString("categoria"),
+						resultado.getBoolean("ativo")));
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+		return servicos;
 	}
 	
-	public Servico selectById(int id) {
-		ResultSet resultSet = null;
+	public Servico selectById(int identificador) {
 		Servico servico = new Servico();
-		String sql = "SELECT * FROM servico WHERE id = "+id;
-		LogSql.exibirComandoSql(sql);
 		try {
-			stmt = conn.prepareStatement(sql);
-			resultSet = stmt.executeQuery();
-			resultSet.next();
-			servico.setCodigo(resultSet.getInt("id"));
-			servico.setDescricao(resultSet.getString("descricao"));
-			servico.setCategoria(resultSet.getString("categoria"));
-			servico.setAtivo(resultSet.getBoolean("ativo"));
-			servico.setValor(resultSet.getDouble("valor"));
-
-		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar sql: " + ex);
+			ResultSet resultado = this.select(this.ENTIDADE, "id = "+identificador);
+			resultado.next();
+			servico.setCodigo(resultado.getInt("id"));
+			servico.setDescricao(resultado.getString("descricao"));
+			servico.setCategoria(resultado.getString("categoria"));
+			servico.setAtivo(resultado.getBoolean("ativo"));
+			servico.setValor(resultado.getDouble("valor"));
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
 		}
 		return servico;
 	}
 	
-	public boolean desativarServico(int id) {
-		
-		String sql = "update servico set ativo = 0 WHERE id = "+id;
-		LogSql.exibirComandoSql(sql);
-		try {
-			stmt = conn.prepareStatement(sql);
-
-			stmt.executeUpdate();
-			System.out.println("Serviço desativado com sucesso");
-			return true;
-
-		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar sql: " + ex);
-			return false;
+	public boolean updateAtivo(boolean ativo, int identificador) { 
+		Map<String, String> dados = new LinkedHashMap<String, String>();
+		Servico servico = this.selectById(identificador);
+		if(servico.isAtivo() != ativo) {
+			dados.put("ativo", ativo ? "1" : "0");
+			return this.update(this.ENTIDADE, dados, identificador);
 		}
+		System.out.println("Serviço ja esta "+(ativo ? "ativado" : "desativado")+"\n");
+		return false;
 	}
 	
-	public boolean ativarServico(int id) {
-		String sql = "update servico set ativo = 1 WHERE id = "+id;
-		LogSql.exibirComandoSql(sql);
-		try {
-			stmt = conn.prepareStatement(sql);
-
-			stmt.executeUpdate();
-			System.out.println("Serviço ativado com sucesso");
-			return true;
-
-		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar sql: " + ex);
-			return false;
-		}
-	}
-
-
-	public ArrayList<Servico> selectAll() {
-		ResultSet resultado = null;
+	public ArrayList<Servico> selectAtivosView() { 
 		ArrayList<Servico> servicos = new ArrayList<>();
-		String sql = "SELECT * FROM servico";
-		LogSql.exibirComandoSql(sql);
 		try {
-			
-			stmt = conn.prepareStatement(sql);
-			resultado = stmt.executeQuery();
-
-			while (resultado.next()) {
+			ResultSet resultado = this.select("servicos_ativos_view");
+			while(resultado.next()) {
 				servicos.add(new Servico(resultado.getInt("id"), resultado.getString("descricao"),
 						resultado.getDouble("valor"), resultado.getString("categoria"),
 						resultado.getBoolean("ativo")));
 			}
-		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar sql: " + ex);
-		} 
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		}
 		return servicos;
 	}
 	
-	public ArrayList<Servico> selectView() {
-		PreparedStatement stmt = null;
-		ResultSet resultado = null;
-		ArrayList<Servico> servicos = new ArrayList<>();
-		String sql = "SELECT * FROM servicos_ativos_view";
-		LogSql.exibirComandoSql(sql);
-		try {
-			stmt = conn.prepareStatement(sql);
-			resultado = stmt.executeQuery();
-
-			while (resultado.next()) {
-				servicos.add(new Servico(resultado.getInt("id"), resultado.getString("descricao"),
-						resultado.getDouble("valor"), resultado.getString("categoria"),
-						resultado.getBoolean("ativo")));
-			}
-		} catch (SQLException ex) {
-			System.out.println("Não foi possível executar sql: " + ex);
-		} 
-		return servicos;
+	public int countAtivos() {
+		return this.count(this.ENTIDADE, " ativo = 1");
 	}
+	
 }

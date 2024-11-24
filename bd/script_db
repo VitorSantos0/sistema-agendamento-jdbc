@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS servico
     id SERIAL PRIMARY KEY UNIQUE,
     descricao varchar(255) NOT NULL,
     valor numeric(9,2) NOT NULL,
-    categoria varchar(255) NOT NULL,
-    ativo integer NOT NULL
+    categoria varchar(255),
+    ativo integer DEFAULT (1)
 );
 
 CREATE TABLE IF NOT EXISTS cliente
@@ -44,6 +44,10 @@ VALUES ('manicure', 40, 'unha', 1),
 ('luzes masculino',30,'cabelo',1),
 ('sobrancelha',25,'rosto',1),
 ('limpeza facial',100,'rosto',0);
+
+INSERT INTO cliente (nome, cpf, endereco, telefone) 
+VALUES ('James Gosling', '59303942531', 'Rua Criador do Java', '7127769216'),
+('Ada Lovelace', '56908455580', '1ª Travessa Programadora ', '7136762242');
 
 CREATE VIEW servicos_ativos_view AS
 	SELECT * FROM servico WHERE ativo = 1;

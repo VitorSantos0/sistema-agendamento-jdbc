@@ -11,7 +11,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import conexao.ConexaoDB;
 import entidade.Agendamento;
 import entidade.AgendamentoDia;
 import entidade.Cliente;
@@ -28,9 +27,6 @@ public class AgendamentoServicoPrincipal {
 	public static void main(String[] args) {
 		
 		exibirMenuPrincipal();
-		
-		ConexaoDB.closeConnection();
-		sc.close();
 
 	}
 	
@@ -45,12 +41,10 @@ public class AgendamentoServicoPrincipal {
             System.out.println("[0] - Encerrar");
             System.out.print("Escolha a entidade que deseja manipular: ");
             String opcao = sc.nextLine();
-            
             if(!opcao.equals("0")) {
             	 System.out.print("Digite 1 para exibir os comandos SQL executados: ");
                  LogSql.exibicao(sc.nextLine().equals("1"));
             }
-           
             switch (opcao) {
                 case "1":
                 	exibirSubmenuServico();
@@ -62,7 +56,7 @@ public class AgendamentoServicoPrincipal {
                     exibirSubmenuAgendamento();
                     break;
                 case "0":
-                    System.out.println("\nEncerrando o programa...");
+                    System.out.println("\nPrograma encerrado");
                     return;
                 default:
                     System.out.println("Opção inválida, tente novamente.");
@@ -73,23 +67,19 @@ public class AgendamentoServicoPrincipal {
 	private static void exibirSubmenuServico() {
         while (true) {
             System.out.println("\n================== SUBMENU SERVIÇO ==================\n");
-            listarServicosDisponiveis();
-            System.out.println("[1] - Ativar");
-            System.out.println("[2] - Desativar");
-            System.out.println("[3] - Visualizar todos");
+            exibirQuantidadeServicosAtivos();
+            System.out.println("[1] - Desativar Serviço");
+            System.out.println("[2] - Visualizar Todos");
             System.out.println("[0] - Voltar");
             System.out.print("Escolha uma opção: ");
             String opcao = sc.nextLine();
     		System.out.println();
             switch (opcao) {
                 case "1":
-                	ativarServico();
-                    break;
-                case "2":
                 	desativarServico();
                     break;
-                case "3":
-                	visualizarServico();
+                case "2":
+                	visualizarTodosServico();
                     break;
                 case "0":
                     return;
@@ -102,7 +92,7 @@ public class AgendamentoServicoPrincipal {
 	public static void exibirSubmenuCliente() {
 		while (true) {
             System.out.println("\n================== SUBMENU CLIENTE ==================\n");
-            listarClientes();
+            exibirQuantidadeClientes();
             System.out.println("[1] - Novo");
             System.out.println("[2] - Editar");
             System.out.println("[3] - Excluir");
@@ -131,7 +121,6 @@ public class AgendamentoServicoPrincipal {
 	public static void exibirSubmenuAgendamento() {
 		while (true) {
             System.out.println("\n================== SUBMENU AGENDAMENTO ==================\n");
-            listarAgendamentosDia();
             exibirQuantidadeAgendamentosDia();
             System.out.println("[1] - Cadastrar");
             System.out.println("[2] - Editar");
@@ -166,7 +155,7 @@ public class AgendamentoServicoPrincipal {
 	
 	public static void listarAgendamentosDia() {
 		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
-		ArrayList<AgendamentoDia> agendamentos = agendamentoDAO.selectAgendamentosDia();
+		ArrayList<AgendamentoDia> agendamentos = agendamentoDAO.selectByDia();
 		for(AgendamentoDia agenda : agendamentos) {
 			System.out.println(agenda.toString()+"\n");
 		}
@@ -175,6 +164,9 @@ public class AgendamentoServicoPrincipal {
 	public static void exibirQuantidadeAgendamentosDia() {
 		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
 		int qtdSerivosDia = agendamentoDAO.getQuantidadeAgendamentoDia();
+		if(qtdSerivosDia > 0) {
+			listarAgendamentosDia();
+		}
 		System.out.println(qtdSerivosDia+" Agendamento(s) encontrado(s) para hoje\n");
 	}
 	
@@ -220,7 +212,7 @@ public class AgendamentoServicoPrincipal {
 			ClienteDAO clienteDAO = new ClienteDAO();
 			Cliente cliente = clienteDAO.selectById(codCliente);
 			AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
-			if(agendamentoDAO.selectByDataHora(dataServico, horaServico)) {
+			if(agendamentoDAO.countDataHora(dataServico, horaServico) > 0) {
 				System.out.println("Já existe uma agendamento cadastrado na mesma data e horário.");
 			} else {
 				Agendamento agendamento = new Agendamento(servico, cliente, nomeProfissional, dataServico, horaServico);
@@ -272,7 +264,7 @@ public class AgendamentoServicoPrincipal {
 			                System.err.print("\nData inválida, digite da forma correta: ");
 			            }
 			        } while(!dataValidacao);
-					agendamentoDAO.updateData(atributos[opcao], dataServico, agendamento.getCodigo());
+					agendamentoDAO.update(atributos[opcao], dataServico, agendamento.getCodigo());
 				} else if (opcao == 3) {
 					DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
 					boolean horaValidacao = false;
@@ -287,7 +279,7 @@ public class AgendamentoServicoPrincipal {
 			                System.err.print("\nData inválida, digite da forma correta: ");
 			            }
 			        } while(!horaValidacao);
-					agendamentoDAO.updateHora(atributos[opcao], horaServico, agendamento.getCodigo());
+					agendamentoDAO.update(atributos[opcao], horaServico, agendamento.getCodigo());
 				} else {
 					agendamentoDAO.update(atributos[opcao], valor, agendamento.getCodigo());
 				}				
@@ -315,7 +307,7 @@ public class AgendamentoServicoPrincipal {
 	
 	public static boolean exibirTodosAgendamentos() {
 		AgendamentoDAO agendamento = new AgendamentoDAO();
-		ArrayList<Agendamento> agendamentos = agendamento.selectAll();
+		ArrayList<Agendamento> agendamentos = agendamento.select();
 		
 		if(agendamentos.isEmpty()) {
 			System.out.println("Nenhum agendamento cadastrado\n");
@@ -345,24 +337,33 @@ public class AgendamentoServicoPrincipal {
 	
 	public static void listarServicosDisponiveis() {
 		ServicoDAO servicoDAO = new ServicoDAO();
-		ArrayList<Servico> servicos = servicoDAO.selectView();
+		ArrayList<Servico> servicos = servicoDAO.selectAtivosView();
 		for (Servico serv : servicos) {
 			System.out.println(serv.toString()+"\n");
 		}
+	}
+	
+	public static void exibirQuantidadeServicosAtivos() {
+		ServicoDAO servicoDAO = new ServicoDAO();
+		int qtdSetivosAtivos = servicoDAO.countAtivos();
+		if(qtdSetivosAtivos > 0) {
+			listarServicosDisponiveis();
+		}
+		System.out.println(qtdSetivosAtivos+" Serviço(s) ativo(s)\n");
 	}
 	
 	public static void ativarServico() {
 	    ServicoDAO servico = new ServicoDAO();
 	    System.out.print("Digite o código do serviço que gostaria de ativar: ");
 	    int codigo = Integer.parseInt(sc.nextLine());
-	    servico.ativarServico(codigo);
+	    servico.updateAtivo(true, codigo);
 	}
 	
 	public static void desativarServico() {
 	    ServicoDAO servico = new ServicoDAO();
 	    System.out.println("Digite o código do serviço que gostaria de desativar: ");
 	    int codigo = Integer.parseInt(sc.nextLine());
-	    servico.desativarServico(codigo);
+	    servico.updateAtivo(false, codigo);
 	}
 	    
 	public static void visualizarServicoID() {
@@ -372,19 +373,40 @@ public class AgendamentoServicoPrincipal {
 	    servico.selectById(codigo);
 	}
 	
-	public static void visualizarServico() {
+	public static void visualizarTodosServico() {
 	    ServicoDAO servico = new ServicoDAO();
-		ArrayList<Servico> servicos = servico.selectAll();
+		ArrayList<Servico> servicos = servico.select();
 		for (Servico serv : servicos) {
-			System.out.println(serv.toString()+"\n");
+			System.out.println(serv.toString()+" | Ativo: "+serv.isAtivo()+"\n");
 		}
+		System.out.println(servicos.size()+" Serviço(s) cadastrado(s)\n");
+		exibirMenuAtivarServico();
+	}
+	
+	public static void exibirMenuAtivarServico() {
+		while (true) {
+            System.out.println("[1] - Ativar Serviço");
+            System.out.println("[0] - Voltar");
+            System.out.print("Escolha uma opção: ");
+            String opcao = sc.nextLine();
+    		System.out.println();
+            switch (opcao) {
+                case "1":
+                	ativarServico();
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opção inválida, tente novamente.");
+            }
+        }
 	}
 	
 	// MÉTODOS CLIENTE
 	
 	public static boolean listarClientes() {
 		ClienteDAO clienteDAO = new ClienteDAO();
-		ArrayList<Cliente> clientes = clienteDAO.selectAll();
+		ArrayList<Cliente> clientes = clienteDAO.select();
 		if(clientes.isEmpty()) {
 			System.out.println("Nenhum cliente cadastrado\n");
 		}else {
@@ -394,6 +416,15 @@ public class AgendamentoServicoPrincipal {
 			return true;
 		}
 		return false;
+	}
+	
+	public static void exibirQuantidadeClientes() {
+		ClienteDAO clienteDAO = new ClienteDAO();
+		int qtdClientes = clienteDAO.count();
+		if(qtdClientes > 0) {
+			listarClientes();
+		}
+		System.out.println(qtdClientes+" Cliente(s) cadastrado(s)\n");
 	}
 	
 	public static void cadastrarCliente() {
