@@ -1,5 +1,5 @@
 ## Agendamento de Serviços JDBC
-### Projeto final da disciplina - Banco de Dados I
+### Projeto Final da Disciplina - Banco de Dados I
 
 #### Requisitos
 - Java 17^
@@ -8,4 +8,4 @@
 #### Configuração
 - Acesse o db.properties para configurar a sua conexão do postgresql
 - Crie um database de acordo com sua configuração
-- Execute o DDL: bd/script_db.txt
+- Execute o script: bd/script_db.txt
