@@ -69,7 +69,7 @@ public class ServicoDAO extends DAO {
 	}
 	
 	public int countAtivos() {
-		return this.count(this.ENTIDADE, " ativo = 1");
+		return this.count(this.ENTIDADE, "ativo = 1");
 	}
 	
 }

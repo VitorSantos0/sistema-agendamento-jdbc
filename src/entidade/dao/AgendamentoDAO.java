@@ -84,7 +84,7 @@ public class AgendamentoDAO extends DAO{
 	
 	public ArrayList<Agendamento> selectByClienteDia(int identificador) { 
 		ArrayList<Agendamento> agendamentosClienteDia = new ArrayList<>();
-		String condicao = "WHERE cliente_id = "+identificador+" AND data_servico >= CURRENT_DATE"
+		String condicao = "cliente_id = "+identificador+" AND data_servico >= CURRENT_DATE"
 				+ " AND hora_servico >= CURRENT_TIME";
 		try {
 			ResultSet resultado = this.select(this.ENTIDADE, condicao);
@@ -153,7 +153,7 @@ public class AgendamentoDAO extends DAO{
 	}
 	
 	public int countDataHora(Date dataServico, Time horaServico) {
-		String condicao = " data_servico = '"+dataServico+"' AND hora_servico = '"+horaServico+"'";
+		String condicao = "data_servico = '"+dataServico+"' AND hora_servico = '"+horaServico+"'";
 		return this.count(this.ENTIDADE, condicao);
 	}
 	
