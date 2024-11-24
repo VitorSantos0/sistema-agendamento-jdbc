@@ -57,6 +57,7 @@ public class AgendamentoServicoPrincipal {
                     break;
                 case "0":
                     System.out.println("\nPrograma encerrado");
+                    sc.close();
                     return;
                 default:
                     System.out.println("Opção inválida, tente novamente.");
@@ -465,7 +466,7 @@ public class AgendamentoServicoPrincipal {
 			System.out.println("[0] - Cancelar");
 			System.out.print("Escolha a informação a ser atualizada: ");
 			String atributos[] = {"cancelar", "nome", "cpf", "endereço", "telefone"};
-			int opcao = 111;
+			int opcao = -1;
 			try {
 				opcao = Integer.parseInt(sc.nextLine());
 			} catch (NumberFormatException ignore) {}
@@ -501,11 +502,11 @@ public class AgendamentoServicoPrincipal {
 					}
 					System.out.print("Existe(m) agendamento(s) para este cliente, apagar mesmo assim? 1-Sim/0-Não");
 					if(sc.nextLine().equals("1")) {
-						clienteDAO.delete(cliente.getCodigo());
 						for (Agendamento agendamento : agendamentosClienteDia) {
 							Timestamp dataHoraAtual = new Timestamp(System.currentTimeMillis());
 							agendamentoDAO.updateCancelamento(dataHoraAtual, agendamento.getCodigo());
 						}
+						clienteDAO.delete(cliente.getCodigo());
 					}
 				}
 			}

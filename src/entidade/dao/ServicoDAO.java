@@ -42,17 +42,6 @@ public class ServicoDAO extends DAO {
 		return servico;
 	}
 	
-	public boolean updateAtivo(boolean ativo, int identificador) { 
-		Map<String, String> dados = new LinkedHashMap<String, String>();
-		Servico servico = this.selectById(identificador);
-		if(servico.isAtivo() != ativo) {
-			dados.put("ativo", ativo ? "1" : "0");
-			return this.update(this.ENTIDADE, dados, identificador);
-		}
-		System.out.println("Serviço ja esta "+(ativo ? "ativado" : "desativado")+"\n");
-		return false;
-	}
-	
 	public ArrayList<Servico> selectAtivosView() { 
 		ArrayList<Servico> servicos = new ArrayList<>();
 		try {
@@ -66,6 +55,17 @@ public class ServicoDAO extends DAO {
 			System.out.println(ex.getMessage());
 		}
 		return servicos;
+	}
+	
+	public boolean updateAtivo(boolean ativo, int identificador) { 
+		Map<String, String> dados = new LinkedHashMap<String, String>();
+		Servico servico = this.selectById(identificador);
+		if(servico.isAtivo() != ativo) {
+			dados.put("ativo", ativo ? "1" : "0");
+			return this.update(this.ENTIDADE, dados, identificador);
+		}
+		System.out.println("Serviço já esta "+(ativo ? "ativado" : "desativado")+"\n");
+		return false;
 	}
 	
 	public int countAtivos() {
