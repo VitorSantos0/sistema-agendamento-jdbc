@@ -1,19 +1,19 @@
 package entidade;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class AgendamentoDia {
 	
 	private String descricao_servico;
 	private double valor_servico;
-	private Date data_servico;
-	private Time hora_servico;
+	private LocalDate data_servico;
+	private LocalTime hora_servico;
 	private String nome_profissional;
 	private String nome_cliente;
 	
-	public AgendamentoDia(String descricao_servico, double valor_servico, Date data_servico, Time hora_servico,
+	public AgendamentoDia(String descricao_servico, double valor_servico, LocalDate data_servico, LocalTime hora_servico,
 			String nome_profissional, String nome_cliente) {
 		this.descricao_servico = descricao_servico;
 		this.valor_servico = valor_servico;
@@ -39,19 +39,19 @@ public class AgendamentoDia {
 		this.valor_servico = valor_servico;
 	}
 	
-	public Date getData_servico() {
+	public LocalDate getData_servico() {
 		return data_servico;
 	}
 	
-	public void setData_servico(Date data_servico) {
+	public void setData_servico(LocalDate data_servico) {
 		this.data_servico = data_servico;
 	}
 	
-	public Time getHora_servico() {
+	public LocalTime getHora_servico() {
 		return hora_servico;
 	}
 	
-	public void setHora_servico(Time hora_servico) {
+	public void setHora_servico(LocalTime hora_servico) {
 		this.hora_servico = hora_servico;
 	}
 	
@@ -73,16 +73,12 @@ public class AgendamentoDia {
 	
 	@Override
 	public String toString() {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		String dataAgendamento = formatter.format(this.getData_servico());
-		formatter = new SimpleDateFormat("hh:mm a");
-		String horaAgendamento = formatter.format(this.getHora_servico());
-		return "Serviço: "+this.getDescricao_servico()
+		return "Serviço: "+this.getDescricao_servico().toUpperCase()
 		+" | Valor: "+this.getValor_servico()
 		+" | Cliente: "+this.getNome_cliente()
 		+" | Profissional: "+this.getNome_profissional()
-		+" | Data: "+dataAgendamento
-		+" | Hora: "+horaAgendamento;
+		+" | Data: "+this.getData_servico().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+		+" | Hora: "+this.getHora_servico().format(DateTimeFormatter.ofPattern("HH:mm"));
 	}
 
 }

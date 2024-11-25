@@ -59,7 +59,7 @@ AS $$
 		qtdAgendamentos integer;
 	BEGIN
 		SELECT COUNT(id) INTO qtdAgendamentos FROM agendamento 
-		WHERE data_servico = CURRENT_DATE;
+		WHERE data_servico = CURRENT_DATE AND data_hora_cancelamento IS NULL;
 		RETURN qtdAgendamentos;
 	END
 $$;

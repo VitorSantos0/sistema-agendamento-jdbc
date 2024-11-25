@@ -1,10 +1,10 @@
 package entidade.dao;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class AgendamentoDAO extends DAO{
 	private final String ENTIDADE = "agendamento";
 	
 	public ArrayList<Agendamento> select() {
-		ArrayList<Agendamento> agendamento = new ArrayList<>();
+		ArrayList<Agendamento> agendamentos = new ArrayList<>();
 		try {
 			ResultSet resultado = this.select(this.ENTIDADE);
 			while(resultado.next()) {
@@ -27,16 +27,20 @@ public class AgendamentoDAO extends DAO{
 				Servico servico =  servicoDAO.selectById(resultado.getInt("servico_id"));
 				ClienteDAO clienteDAO = new ClienteDAO();
 				Cliente cliente = clienteDAO.selectById(resultado.getInt("cliente_id"));
-				agendamento.add(new Agendamento(resultado.getInt("id"), servico, cliente,
+				Agendamento agendamento = new Agendamento(resultado.getInt("id"), servico, cliente,
 						resultado.getString("nome_profissional"),
-						resultado.getDate("data_servico"), resultado.getTime("hora_servico"),
-						resultado.getTimestamp("data_hora_lancamento"),
-						resultado.getTimestamp("data_hora_cancelamento")));
+						resultado.getDate("data_servico").toLocalDate(), 
+						resultado.getTime("hora_servico").toLocalTime(),
+						resultado.getTimestamp("data_hora_lancamento").toLocalDateTime());
+				if(resultado.getTimestamp("data_hora_cancelamento") != null) {
+					agendamento.setDataHoraCancelamento(resultado.getTimestamp("data_hora_cancelamento").toLocalDateTime());
+				}
+				agendamentos.add(agendamento);
 			}
 		} catch (SQLException e) {
 			System.out.println("Não foi possível acessar os dados: " + e);
 		}
-		return agendamento;
+		return agendamentos;
 	}
 	
 	public Agendamento selectById(int identificador) {
@@ -52,10 +56,12 @@ public class AgendamentoDAO extends DAO{
 				agendamento.setServico(servico);
 				agendamento.setCliente(cliente);
 				agendamento.setNomeProfissional(resultado.getString("nome_profissional"));
-				agendamento.setDataServico(resultado.getDate("data_servico"));
-				agendamento.setHoraServico(resultado.getTime("hora_servico"));
-				agendamento.setDataHoraLancamento(resultado.getTimestamp("data_hora_lancamento"));
-				agendamento.setDataHoraCancelamento(resultado.getTimestamp("data_hora_cancelamento"));
+				agendamento.setDataServico(resultado.getDate("data_servico").toLocalDate());
+				agendamento.setHoraServico(resultado.getTime("hora_servico").toLocalTime());
+				agendamento.setDataHoraLancamento(resultado.getTimestamp("data_hora_lancamento").toLocalDateTime());
+				if(resultado.getTimestamp("data_hora_cancelamento") != null) {					
+					agendamento.setDataHoraCancelamento(resultado.getTimestamp("data_hora_cancelamento").toLocalDateTime());
+				}
 			}
 		} catch (SQLException e) {
 			System.out.println("Não foi possível acessar os dados: " + e);
@@ -69,12 +75,13 @@ public class AgendamentoDAO extends DAO{
 			String query = "SELECT serv.descricao AS descricao_servico, serv.valor AS valor_servico,"
 					+"agd.data_servico, agd.hora_servico, agd.nome_profissional, cli.nome AS nome_cliente "
 					+"FROM agendamento agd INNER JOIN servico serv ON agd.servico_id = serv.id "
-					+"INNER JOIN cliente cli ON agd.cliente_id = cli.id WHERE agd.data_servico = CURRENT_DATE";
+					+"INNER JOIN cliente cli ON agd.cliente_id = cli.id WHERE agd.data_servico = CURRENT_DATE "
+					+ "AND agd.data_hora_cancelamento IS NULL";
 			ResultSet resultado = this.selectQuery(query);
 			while(resultado.next()) {
 				AgendamentoDia agendamentoDia = new AgendamentoDia(resultado.getString("descricao_servico"), 
-						resultado.getDouble("valor_servico"), resultado.getDate("data_servico"), 
-						resultado.getTime("hora_servico"), resultado.getString("nome_profissional"), 
+						resultado.getDouble("valor_servico"), resultado.getDate("data_servico").toLocalDate(), 
+						resultado.getTime("hora_servico").toLocalTime(), resultado.getString("nome_profissional"), 
 						resultado.getString("nome_cliente"));
 				agendamentosDia.add(agendamentoDia);
 			}
@@ -87,7 +94,7 @@ public class AgendamentoDAO extends DAO{
 	public ArrayList<Agendamento> selectByClienteDia(int identificador) { 
 		ArrayList<Agendamento> agendamentosClienteDia = new ArrayList<>();
 		String condicao = "cliente_id = "+identificador+" AND data_servico >= CURRENT_DATE"
-				+ " AND hora_servico >= CURRENT_TIME";
+				+ " AND hora_servico >= CURRENT_TIME AND data_hora_cancelamento IS NULL";
 		try {
 			ResultSet resultado = this.select(this.ENTIDADE, condicao);
 			while (resultado.next()) { 
@@ -97,10 +104,12 @@ public class AgendamentoDAO extends DAO{
 				Cliente cliente = clienteDAO.selectById(resultado.getInt("cliente_id"));
 				Agendamento agendamento = new Agendamento(resultado.getInt("id"), servico, cliente,
 						resultado.getString("nome_profissional"),
-						resultado.getDate("data_servico"), 
-						resultado.getTime("hora_servico"),
-						resultado.getTimestamp("data_hora_lancamento"),
-						resultado.getTimestamp("data_hora_cancelamento"));
+						resultado.getDate("data_servico").toLocalDate(), 
+						resultado.getTime("hora_servico").toLocalTime(),
+						resultado.getTimestamp("data_hora_lancamento").toLocalDateTime());
+				if(resultado.getTimestamp("data_hora_cancelamento") != null) {
+					agendamento.setDataHoraCancelamento(resultado.getTimestamp("data_hora_cancelamento").toLocalDateTime());
+				}
 				agendamentosClienteDia.add(agendamento);
 			}
 		} catch (SQLException e) {
@@ -119,7 +128,7 @@ public class AgendamentoDAO extends DAO{
 		return this.insert(this.ENTIDADE, dados);
 	}
 	
-	public boolean updateCancelamento(Timestamp dataHoraCancelamento, int identificador) {
+	public boolean updateCancelamento(LocalDateTime dataHoraCancelamento, int identificador) {
 		Map<String, String> dados = new LinkedHashMap<String, String>();
 		dados.put("data_hora_cancelamento", String.valueOf(dataHoraCancelamento));
 		return this.update(this.ENTIDADE, dados, identificador);
@@ -131,13 +140,13 @@ public class AgendamentoDAO extends DAO{
 		return this.update(this.ENTIDADE, dados, identificador);
 	}
 	
-	public boolean update(String chave, Date dataServico, int identificador) {
+	public boolean update(String chave, LocalDate dataServico, int identificador) {
 		Map<String, String> dados = new LinkedHashMap<String, String>();
 		dados.put(chave, String.valueOf(dataServico));
 		return this.update(this.ENTIDADE, dados, identificador);
 	}
 	
-	public boolean update(String chave, Time horaServico, int identificador) {
+	public boolean update(String chave, LocalTime horaServico, int identificador) {
 		Map<String, String> dados = new LinkedHashMap<String, String>();
 		dados.put(chave, String.valueOf(horaServico));
 		return this.update(this.ENTIDADE, dados, identificador);
@@ -146,16 +155,18 @@ public class AgendamentoDAO extends DAO{
 	public int getQuantidadeAgendamentoDia() {
 		try {
 			ResultSet resultado = this.selectQuery("SELECT quantidade_agendamentos_dia()");
-			resultado.next();
-			return resultado.getInt("quantidade_agendamentos_dia");
+			if(resultado.next()) {
+				return resultado.getInt("quantidade_agendamentos_dia");
+			}
+			return 0;
 		} catch (SQLException e) {
 			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return 0;
 	}
 	
-	public int countDataHora(Date dataServico, Time horaServico) {
-		String condicao = "data_servico = '"+dataServico+"' AND hora_servico = '"+horaServico+"'";
+	public int countDataHora(LocalDate dataServico, LocalTime horaServico) {
+		String condicao = "data_servico = '"+dataServico+"' AND hora_servico = '"+horaServico+"' AND data_hora_cancelamento IS NULL";
 		return this.count(this.ENTIDADE, condicao);
 	}
 	

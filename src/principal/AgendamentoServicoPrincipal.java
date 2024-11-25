@@ -1,11 +1,7 @@
 package principal;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -197,41 +193,22 @@ public class AgendamentoServicoPrincipal {
 			System.out.print("Informe o nome do profissional: ");
 			String nomeProfissional = sc.nextLine();
 			System.out.print("Informe a data do serviço (Exemplo: 01/01/2025): ");
-			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-			boolean dataValidacao = false;
-			Date dataServico = null;
-			do {
-				String dataServicoString = sc.nextLine();
-				try {
-					java.util.Date utilDate = dateFormatter.parse(dataServicoString);
-					dataServico = new Date(utilDate.getTime());
-					LocalDate.parse(dataServicoString);
-					DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-	            	LocalDate.parse(dataServicoString, formatterValidacao2);
-					dataValidacao = true;
-				} catch (ParseException e) {
-					System.err.print("\nData inválida, digite da forma correta: ");
-				}
-			} while(!dataValidacao);
+			String dataServicoString = sc.nextLine();
+			while(!dataValida(dataServicoString)) {
+				System.out.print("Digite uma data válida: ");
+				dataServicoString = sc.nextLine();
+			}
+			LocalDate dataServico = LocalDate.parse(dataServicoString);
 			System.out.print("Informe a hora do serviço (Exemplo: 08:00): ");
-			DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
-			boolean horaValidacao = false;
-			Time horaServico = null;
-			do {
-				String horaServicoString = sc.nextLine();
-				try {
-					LocalTime localTime = LocalTime.parse(horaServicoString, horaFormatter);
-					horaServico = Time.valueOf(localTime);
-					DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("HH:mm");
-	            	LocalTime.parse(horaServicoString, formatterValidacao2);
-					horaValidacao = true;
-				} catch (DateTimeParseException e) {
-					System.out.print("\nData inválida, digite da forma correta: ");
-				}
-			} while(!horaValidacao);
+			String horaServicoString = sc.nextLine();
+			while(!horaValida(horaServicoString)) {
+				System.out.print("Digite uma data válida: ");
+				horaServicoString = sc.nextLine();
+			}
+			LocalTime horaServico = LocalTime.parse(horaServicoString);
 			AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
 			if(agendamentoDAO.countDataHora(dataServico, horaServico) > 0) {
-				System.out.println("Já existe uma agendamento cadastrado na mesma data e horário.");
+				System.out.println("Já existe um agendamento cadastrado na mesma data e horário.");
 			} else {
 				Agendamento agendamento = new Agendamento(servico, cliente, nomeProfissional, dataServico, horaServico);
 				agendamentoDAO.insert(agendamento);
@@ -264,43 +241,23 @@ public class AgendamentoServicoPrincipal {
 				String atributo = atributos[opcao].replace("_", " ");
 				String atributoComplemento = exemploFormato[opcao];
 				if(opcao != 1) {
-					atributo = atributos[opcao].replace("_", " ").replace("c", "ç");
+					atributo = atributos[opcao].replace("_", " do ").replace("c", "ç");
 				}
 				System.out.print("Informe o(a) novo(a) "+atributo+" do agendamento"+atributoComplemento+": ");
 				String valor = sc.nextLine();
 				if(opcao == 2) {
-					SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-					boolean dataValidacao = false;
-					Date dataServico = null;
-					do {
-			            String dataServicoString = valor;
-			            try {
-			            	java.util.Date utilDate = dateFormatter.parse(dataServicoString);
-			            	dataServico = new Date(utilDate.getTime());
-			            	DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			            	LocalDate.parse(dataServicoString, formatterValidacao2);
-			                dataValidacao = true;
-			            } catch (ParseException e) {
-			                System.err.print("\nData inválida, digite da forma correta: ");
-			            }
-			        } while(!dataValidacao);
+					while(!dataValida(valor)) {
+						System.out.print("Digite uma "+atributo+" válida: ");
+						valor = sc.nextLine();
+					}
+					LocalDate dataServico = LocalDate.parse(valor);
 					agendamentoDAO.update(atributos[opcao], dataServico, agendamento.getCodigo());
 				} else if (opcao == 3) {
-					DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
-					boolean horaValidacao = false;
-					Time horaServico = null;
-					do {
-			            String horaServicoString = valor;
-			            try {
-			            	LocalTime localTime = LocalTime.parse(horaServicoString, horaFormatter);
-			            	horaServico = Time.valueOf(localTime);
-			            	DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("HH:mm");
-			            	LocalTime.parse(horaServicoString, formatterValidacao2);
-			            	horaValidacao = true;
-			            } catch (DateTimeParseException e) {
-			                System.err.print("\nData inválida, digite da forma correta: ");
-			            }
-			        } while(!horaValidacao);
+					while(!horaValida(valor)) {
+						System.out.print("Digite uma "+atributo+" válida: ");
+						valor = sc.nextLine();
+					}
+					LocalTime horaServico = LocalTime.parse(valor);
 					agendamentoDAO.update(atributos[opcao], horaServico, agendamento.getCodigo());
 				} else {
 					agendamentoDAO.update(atributos[opcao], valor, agendamento.getCodigo());
@@ -311,7 +268,6 @@ public class AgendamentoServicoPrincipal {
 	
 	public static void cancelarAgendamento() {
 		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
-		Timestamp dataHoraAtual = new Timestamp(System.currentTimeMillis());
 		if(exibirTodosAgendamentos()) {
 			System.out.print("Digite o código do agendamento que deseja cancelar: ");
 			int codigo = Integer.parseInt(sc.nextLine());
@@ -324,19 +280,19 @@ public class AgendamentoServicoPrincipal {
 			System.out.print("Deseja realmente cancelar o agendamento? 1-Sim/0-Não ");
 			String opcao= sc.nextLine();	
 			if(opcao.equals("1")) {
-				agendamentoDAO.updateCancelamento(dataHoraAtual, codigo);
+				agendamentoDAO.updateCancelamento(LocalDateTime.now(), codigo);
 			}
 		}
 	}
 	
 	public static boolean exibirTodosAgendamentos() {
-		AgendamentoDAO agendamento = new AgendamentoDAO();
-		ArrayList<Agendamento> agendamentos = agendamento.select();
+		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
+		ArrayList<Agendamento> agendamentos = agendamentoDAO.select();
 		if(agendamentos.isEmpty()) {
 			System.out.println("Nenhum agendamento cadastrado\n");
 		}else {
-			for (Agendamento agend : agendamentos) {
-				System.out.println(agend.toString()+"\n");
+			for (Agendamento agendamento : agendamentos) {
+				System.out.println(agendamento.toString()+"\n");
 			}
 			return true;
 		}
@@ -525,14 +481,31 @@ public class AgendamentoServicoPrincipal {
 					System.out.print("Existe(m) agendamento(s) para este cliente, apagar mesmo assim? 1-Sim/0-Não");
 					if(sc.nextLine().equals("1")) {
 						for (Agendamento agendamento : agendamentosClienteDia) {
-							Timestamp dataHoraAtual = new Timestamp(System.currentTimeMillis());
-							agendamentoDAO.updateCancelamento(dataHoraAtual, agendamento.getCodigo());
+							agendamentoDAO.updateCancelamento(LocalDateTime.now(), agendamento.getCodigo());
 						}
 						clienteDAO.delete(cliente.getCodigo());
 					}
 				}
 			}
 		}
+	}
+	
+	public static boolean dataValida(String dateString) {
+        try {
+            LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+	
+	public static boolean horaValida(String horaString) {
+        try {
+            LocalDate.parse(horaString, DateTimeFormatter.ofPattern("HH:mm"));
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
 	}
 	
 }

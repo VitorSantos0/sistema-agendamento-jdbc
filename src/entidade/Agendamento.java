@@ -1,9 +1,9 @@
 package entidade;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Agendamento {
 	
@@ -11,14 +11,14 @@ public class Agendamento {
 	private Servico servico;
 	private Cliente cliente;
 	private String nomeProfissional;
-	private Date dataServico;
-	private Time horaServico;
-	private Timestamp dataHoraLancamento;
-	private Timestamp dataHoraCancelamento;
+	private LocalDate dataServico;
+	private LocalTime horaServico;
+	private LocalDateTime dataHoraLancamento;
+	private LocalDateTime dataHoraCancelamento;
 	
 	public Agendamento() {}
 	
-	public Agendamento(Servico servico, Cliente cliente, String nomeProfissional, Date dataServico, Time horaServico) {
+	public Agendamento(Servico servico, Cliente cliente, String nomeProfissional, LocalDate dataServico, LocalTime horaServico) {
 		this.servico = servico;
 		this.cliente = cliente;
 		this.nomeProfissional = nomeProfissional;
@@ -27,7 +27,18 @@ public class Agendamento {
 	}
 	
 	public Agendamento(int codigo, Servico servico, Cliente cliente, String nomeProfissional,
-			Date dataServico, Time horaServico, Timestamp dataHoraLancamento, Timestamp dataHoraCancelamento) {
+			LocalDate dataServico, LocalTime horaServico, LocalDateTime dataHoraLancamento) {
+		this.codigo = codigo;
+		this.servico = servico;
+		this.cliente = cliente;
+		this.nomeProfissional = nomeProfissional;
+		this.dataServico = dataServico;
+		this.horaServico = horaServico;
+		this.dataHoraLancamento = dataHoraLancamento;
+	}
+	
+	public Agendamento(int codigo, Servico servico, Cliente cliente, String nomeProfissional,
+			LocalDate dataServico, LocalTime horaServico, LocalDateTime dataHoraLancamento, LocalDateTime dataHoraCancelamento) {
 		this.codigo = codigo;
 		this.servico = servico;
 		this.cliente = cliente;
@@ -70,50 +81,50 @@ public class Agendamento {
 		this.nomeProfissional = nomeProfissional;
 	}
 
-	public Date getDataServico() {
+	public LocalDate getDataServico() {
 		return dataServico;
 	}
 
-	public void setDataServico(Date dataServico) {
+	public void setDataServico(LocalDate dataServico) {
 		this.dataServico = dataServico;
 	}
 
-	public Time getHoraServico() {
+	public LocalTime getHoraServico() {
 		return horaServico;
 	}
 
-	public void setHoraServico(Time horaServico) {
-		this.horaServico = horaServico;
+	public void setHoraServico(LocalTime dataServico) {
+		this.horaServico = dataServico;
 	}
 
-	public Timestamp getDataHoraLancamento() {
+	public LocalDateTime getDataHoraLancamento() {
 		return dataHoraLancamento;
 	}
 
-	public void setDataHoraLancamento(Timestamp dataHoraLancamento) {
+	public void setDataHoraLancamento(LocalDateTime dataHoraLancamento) {
 		this.dataHoraLancamento = dataHoraLancamento;
 	}
 
-	public Timestamp getDataHoraCancelamento() {
+	public LocalDateTime getDataHoraCancelamento() {
 		return dataHoraCancelamento;
 	}
 
-	public void setDataHoraCancelamento(Timestamp dataHoraCancelamento) {
+	public void setDataHoraCancelamento(LocalDateTime dataHoraCancelamento) {
 		this.dataHoraCancelamento = dataHoraCancelamento;
 	}
 	
 	@Override
 	public String toString() {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		String dataAgendamento = formatter.format(this.getDataServico());
-		formatter = new SimpleDateFormat("hh:mm a");
-		String horaAgendamento = formatter.format(this.getHoraServico());
+		String cancelamento = this.getDataHoraCancelamento() != null ?  
+				" | Cancelamento: "+this.getDataHoraCancelamento()
+				.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
 		return "Código: "+this.getCodigo()
 				+" | Cliente: "+this.getCliente().getNome()
-				+" | Serviço: "+this.getServico().getDescricao()
+				+" | Serviço: "+this.getServico().getDescricao().toUpperCase()
 				+" | Profissional: "+this.getNomeProfissional()
-				+" | Data: "+dataAgendamento
-				+" | Hora: "+horaAgendamento;
+				+" | Data: "+this.getDataServico().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+				+" | Hora: "+this.getHoraServico().format(DateTimeFormatter.ofPattern("HH:mm"))
+				+cancelamento;
 	}
 	
 }
