@@ -81,6 +81,7 @@ public class AgendamentoServicoPrincipal {
                     break;
                 case "2":
                 	visualizarTodosServico();
+                	exibirMenuAtivarServico();
                     break;
                 case "0":
                     return;
@@ -376,7 +377,6 @@ public class AgendamentoServicoPrincipal {
 			System.out.println(serv.toString()+" | Ativo: "+serv.isAtivo()+"\n");
 		}
 		System.out.println(servicos.size()+" Serviço(s) cadastrado(s)\n");
-		exibirMenuAtivarServico();
 	}
 	
 	public static void exibirMenuAtivarServico() {
