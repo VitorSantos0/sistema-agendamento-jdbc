@@ -1,11 +1,14 @@
 ## Agendamento de Serviços JDBC
-### Projeto final da disciplina - Banco de Dados I
+### Projeto Final da Disciplina - Banco de Dados I - UCSAL
 
 #### Requisitos
 - Java 17^
-- Driver JDBC PostgreSql
+- Postgre SQL Server
+- Driver JDBC postgresql
 
 #### Configuração
+- Com o driver postgresql baixado:
+    - Altere na biblioteca do projeto o caminho para o driver em seu computador
 - Acesse o db.properties para configurar a sua conexão do postgresql
 - Crie um database de acordo com sua configuração
-- Execute o DDL: bd/script_db.txt
+- Execute o script: bd/script_db.txt
