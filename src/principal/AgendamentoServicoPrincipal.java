@@ -289,27 +289,22 @@ public class AgendamentoServicoPrincipal {
 	}
 	
 	public static void cancelarAgendamento() {
-
 		AgendamentoDAO agendamento = new AgendamentoDAO();
 		Timestamp dataHoraAtual = new Timestamp(System.currentTimeMillis());
-		
-		exibirTodosAgendamentos();
-		
-		System.out.print("Digite o código do agendamento que deseja cancelar: ");
-		int codigo = Integer.parseInt(sc.nextLine());
-		
-		System.out.println("Deseja realmente cancelar o agendamento? 1-Sim/0-Não ");
-		String opcao= sc.nextLine();	
-		
-		if(opcao.equals("1")) {
-			agendamento.updateCancelamento(dataHoraAtual, codigo);
+		if(exibirTodosAgendamentos()) {
+			System.out.print("Digite o código do agendamento que deseja cancelar: ");
+			int codigo = Integer.parseInt(sc.nextLine());
+			System.out.println("Deseja realmente cancelar o agendamento? 1-Sim/0-Não ");
+			String opcao= sc.nextLine();	
+			if(opcao.equals("1")) {
+				agendamento.updateCancelamento(dataHoraAtual, codigo);
+			}
 		}
 	}
 	
 	public static boolean exibirTodosAgendamentos() {
 		AgendamentoDAO agendamento = new AgendamentoDAO();
 		ArrayList<Agendamento> agendamentos = agendamento.select();
-		
 		if(agendamentos.isEmpty()) {
 			System.out.println("Nenhum agendamento cadastrado\n");
 		}else {
@@ -362,7 +357,7 @@ public class AgendamentoServicoPrincipal {
 	
 	public static void desativarServico() {
 	    ServicoDAO servico = new ServicoDAO();
-	    System.out.println("Digite o código do serviço que gostaria de desativar: ");
+	    System.out.print("Digite o código do serviço que gostaria de desativar: ");
 	    int codigo = Integer.parseInt(sc.nextLine());
 	    servico.updateAtivo(false, codigo);
 	}
@@ -394,6 +389,7 @@ public class AgendamentoServicoPrincipal {
             switch (opcao) {
                 case "1":
                 	ativarServico();
+                	visualizarTodosServico();
                     break;
                 case "0":
                     return;

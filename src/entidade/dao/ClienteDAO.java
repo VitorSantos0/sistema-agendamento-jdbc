@@ -1,6 +1,7 @@
 package entidade.dao;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,8 +21,8 @@ public class ClienteDAO extends DAO {
 						resultado.getString("cpf"), resultado.getString("endereco"),
 						resultado.getString("telefone")));
 			}
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return clientes;
 	}
@@ -36,8 +37,8 @@ public class ClienteDAO extends DAO {
 			cliente.setCpf(resultado.getString("cpf"));
 			cliente.setEndereco(resultado.getString("endereco"));
 			cliente.setTelefone(resultado.getString("telefone"));
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return cliente;
 	}

@@ -3,6 +3,7 @@ package entidade.dao;
 import entidade.Servico;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,8 +21,8 @@ public class ServicoDAO extends DAO {
 						resultado.getDouble("valor"), resultado.getString("categoria"),
 						resultado.getBoolean("ativo")));
 			}
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return servicos;
 	}
@@ -36,8 +37,8 @@ public class ServicoDAO extends DAO {
 			servico.setCategoria(resultado.getString("categoria"));
 			servico.setAtivo(resultado.getBoolean("ativo"));
 			servico.setValor(resultado.getDouble("valor"));
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return servico;
 	}
@@ -51,8 +52,8 @@ public class ServicoDAO extends DAO {
 						resultado.getDouble("valor"), resultado.getString("categoria"),
 						resultado.getBoolean("ativo")));
 			}
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return servicos;
 	}

@@ -2,6 +2,7 @@ package entidade.dao;
 
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -32,8 +33,8 @@ public class AgendamentoDAO extends DAO{
 						resultado.getTimestamp("data_hora_lancamento"),
 						resultado.getTimestamp("data_hora_cancelamento")));
 			}
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return agendamento;
 	}
@@ -55,8 +56,8 @@ public class AgendamentoDAO extends DAO{
 			agendamento.setHoraServico(resultado.getTime("hora_servico"));
 			agendamento.setDataHoraLancamento(resultado.getTimestamp("data_hora_lancamento"));
 			agendamento.setDataHoraCancelamento(resultado.getTimestamp("data_hora_cancelamento"));
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return agendamento;
 	}
@@ -76,8 +77,8 @@ public class AgendamentoDAO extends DAO{
 						resultado.getString("nome_cliente"));
 				agendamentosDia.add(agendamentoDia);
 			}
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return agendamentosDia;
 	}
@@ -101,8 +102,8 @@ public class AgendamentoDAO extends DAO{
 						resultado.getTimestamp("data_hora_cancelamento"));
 				agendamentosClienteDia.add(agendamento);
 			}
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return agendamentosClienteDia;
 	}
@@ -146,8 +147,8 @@ public class AgendamentoDAO extends DAO{
 			ResultSet resultado = this.selectQuery("SELECT quantidade_agendamentos_dia()");
 			resultado.next();
 			return resultado.getInt("quantidade_agendamentos_dia");
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+		} catch (SQLException e) {
+			System.out.println("Não foi possível acessar os dados: " + e);
 		}
 		return 0;
 	}
