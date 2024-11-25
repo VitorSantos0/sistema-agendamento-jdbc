@@ -43,19 +43,20 @@ public class AgendamentoDAO extends DAO{
 		Agendamento agendamento = new Agendamento();
 		try {
 			ResultSet resultado = this.select(this.ENTIDADE, "id = "+identificador);
-			resultado.next();
-			ServicoDAO servicoDAO = new ServicoDAO();
-			Servico servico =  servicoDAO.selectById(resultado.getInt("servico_id"));
-			ClienteDAO clienteDAO = new ClienteDAO();
-			Cliente cliente = clienteDAO.selectById(resultado.getInt("cliente_id"));
-			agendamento.setCodigo(resultado.getInt("id"));
-			agendamento.setServico(servico);
-			agendamento.setCliente(cliente);
-			agendamento.setNomeProfissional(resultado.getString("nome_profissional"));
-			agendamento.setDataServico(resultado.getDate("data_servico"));
-			agendamento.setHoraServico(resultado.getTime("hora_servico"));
-			agendamento.setDataHoraLancamento(resultado.getTimestamp("data_hora_lancamento"));
-			agendamento.setDataHoraCancelamento(resultado.getTimestamp("data_hora_cancelamento"));
+			if(resultado.next()) {
+				ServicoDAO servicoDAO = new ServicoDAO();
+				Servico servico =  servicoDAO.selectById(resultado.getInt("servico_id"));
+				ClienteDAO clienteDAO = new ClienteDAO();
+				Cliente cliente = clienteDAO.selectById(resultado.getInt("cliente_id"));
+				agendamento.setCodigo(resultado.getInt("id"));
+				agendamento.setServico(servico);
+				agendamento.setCliente(cliente);
+				agendamento.setNomeProfissional(resultado.getString("nome_profissional"));
+				agendamento.setDataServico(resultado.getDate("data_servico"));
+				agendamento.setHoraServico(resultado.getTime("hora_servico"));
+				agendamento.setDataHoraLancamento(resultado.getTimestamp("data_hora_lancamento"));
+				agendamento.setDataHoraCancelamento(resultado.getTimestamp("data_hora_cancelamento"));
+			}
 		} catch (SQLException e) {
 			System.out.println("Não foi possível acessar os dados: " + e);
 		}

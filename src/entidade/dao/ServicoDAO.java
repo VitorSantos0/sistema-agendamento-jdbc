@@ -31,12 +31,13 @@ public class ServicoDAO extends DAO {
 		Servico servico = new Servico();
 		try {
 			ResultSet resultado = this.select(this.ENTIDADE, "id = "+identificador);
-			resultado.next();
-			servico.setCodigo(resultado.getInt("id"));
-			servico.setDescricao(resultado.getString("descricao"));
-			servico.setCategoria(resultado.getString("categoria"));
-			servico.setAtivo(resultado.getBoolean("ativo"));
-			servico.setValor(resultado.getDouble("valor"));
+			if(resultado.next()) {
+				servico.setCodigo(resultado.getInt("id"));
+				servico.setDescricao(resultado.getString("descricao"));
+				servico.setCategoria(resultado.getString("categoria"));
+				servico.setAtivo(resultado.getBoolean("ativo"));
+				servico.setValor(resultado.getDouble("valor"));
+			}
 		} catch (SQLException e) {
 			System.out.println("Não foi possível acessar os dados: " + e);
 		}

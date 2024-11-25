@@ -5,6 +5,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -176,9 +177,23 @@ public class AgendamentoServicoPrincipal {
 		listarServicosDisponiveis();
 		System.out.print("Informe o código do serviço: ");
 		int codServico = Integer.parseInt(sc.nextLine());
+		ServicoDAO servicoDAO = new ServicoDAO();
+		Servico servico = servicoDAO.selectById(codServico);
+		while(servico.getCodigo() == 0 || !servico.isAtivo()) {
+			System.out.print("Informe um código válido: ");
+			codServico = Integer.parseInt(sc.nextLine());
+			servico = servicoDAO.selectById(codServico);
+		}
 		if(listarClientes()) {			
 			System.out.print("Informe o código do cliente: ");
 			int codCliente = Integer.parseInt(sc.nextLine());
+			ClienteDAO clienteDAO = new ClienteDAO();
+			Cliente cliente = clienteDAO.selectById(codCliente);
+			while(cliente.getCodigo() == 0) {
+				System.out.print("Informe um código válido: ");
+				codCliente = Integer.parseInt(sc.nextLine());
+				cliente = clienteDAO.selectById(codCliente);
+			}
 			System.out.print("Informe o nome do profissional: ");
 			String nomeProfissional = sc.nextLine();
 			System.out.print("Informe a data do serviço (Exemplo: 01/01/2025): ");
@@ -190,6 +205,9 @@ public class AgendamentoServicoPrincipal {
 				try {
 					java.util.Date utilDate = dateFormatter.parse(dataServicoString);
 					dataServico = new Date(utilDate.getTime());
+					LocalDate.parse(dataServicoString);
+					DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	            	LocalDate.parse(dataServicoString, formatterValidacao2);
 					dataValidacao = true;
 				} catch (ParseException e) {
 					System.err.print("\nData inválida, digite da forma correta: ");
@@ -204,15 +222,13 @@ public class AgendamentoServicoPrincipal {
 				try {
 					LocalTime localTime = LocalTime.parse(horaServicoString, horaFormatter);
 					horaServico = Time.valueOf(localTime);
+					DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("HH:mm");
+	            	LocalTime.parse(horaServicoString, formatterValidacao2);
 					horaValidacao = true;
 				} catch (DateTimeParseException e) {
-					System.err.print("\nData inválida, digite da forma correta: ");
+					System.out.print("\nData inválida, digite da forma correta: ");
 				}
 			} while(!horaValidacao);
-			ServicoDAO servicoDAO = new ServicoDAO();
-			Servico servico = servicoDAO.selectById(codServico);
-			ClienteDAO clienteDAO = new ClienteDAO();
-			Cliente cliente = clienteDAO.selectById(codCliente);
 			AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
 			if(agendamentoDAO.countDataHora(dataServico, horaServico) > 0) {
 				System.out.println("Já existe uma agendamento cadastrado na mesma data e horário.");
@@ -261,6 +277,8 @@ public class AgendamentoServicoPrincipal {
 			            try {
 			            	java.util.Date utilDate = dateFormatter.parse(dataServicoString);
 			            	dataServico = new Date(utilDate.getTime());
+			            	DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			            	LocalDate.parse(dataServicoString, formatterValidacao2);
 			                dataValidacao = true;
 			            } catch (ParseException e) {
 			                System.err.print("\nData inválida, digite da forma correta: ");
@@ -276,6 +294,8 @@ public class AgendamentoServicoPrincipal {
 			            try {
 			            	LocalTime localTime = LocalTime.parse(horaServicoString, horaFormatter);
 			            	horaServico = Time.valueOf(localTime);
+			            	DateTimeFormatter formatterValidacao2 = DateTimeFormatter.ofPattern("HH:mm");
+			            	LocalTime.parse(horaServicoString, formatterValidacao2);
 			            	horaValidacao = true;
 			            } catch (DateTimeParseException e) {
 			                System.err.print("\nData inválida, digite da forma correta: ");
@@ -290,15 +310,21 @@ public class AgendamentoServicoPrincipal {
 	}
 	
 	public static void cancelarAgendamento() {
-		AgendamentoDAO agendamento = new AgendamentoDAO();
+		AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
 		Timestamp dataHoraAtual = new Timestamp(System.currentTimeMillis());
 		if(exibirTodosAgendamentos()) {
 			System.out.print("Digite o código do agendamento que deseja cancelar: ");
 			int codigo = Integer.parseInt(sc.nextLine());
-			System.out.println("Deseja realmente cancelar o agendamento? 1-Sim/0-Não ");
+			Agendamento agendamento = agendamentoDAO.selectById(codigo);
+			while(agendamento.getCodigo() == 0) {
+				System.out.print("Informe um código válido: ");
+				codigo = Integer.parseInt(sc.nextLine());
+				agendamento = agendamentoDAO.selectById(codigo);
+			}
+			System.out.print("Deseja realmente cancelar o agendamento? 1-Sim/0-Não ");
 			String opcao= sc.nextLine();	
 			if(opcao.equals("1")) {
-				agendamento.updateCancelamento(dataHoraAtual, codigo);
+				agendamentoDAO.updateCancelamento(dataHoraAtual, codigo);
 			}
 		}
 	}

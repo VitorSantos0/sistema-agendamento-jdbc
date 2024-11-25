@@ -31,12 +31,13 @@ public class ClienteDAO extends DAO {
 		Cliente cliente = new Cliente();
 		try {
 			ResultSet resultado = this.select(this.ENTIDADE, "id = "+identificador);
-			resultado.next();
-			cliente.setCodigo(resultado.getInt("id"));
-			cliente.setNome(resultado.getString("nome"));
-			cliente.setCpf(resultado.getString("cpf"));
-			cliente.setEndereco(resultado.getString("endereco"));
-			cliente.setTelefone(resultado.getString("telefone"));
+			if(resultado.next()) {
+				cliente.setCodigo(resultado.getInt("id"));
+				cliente.setNome(resultado.getString("nome"));
+				cliente.setCpf(resultado.getString("cpf"));
+				cliente.setEndereco(resultado.getString("endereco"));
+				cliente.setTelefone(resultado.getString("telefone"));
+			}
 		} catch (SQLException e) {
 			System.out.println("Não foi possível acessar os dados: " + e);
 		}

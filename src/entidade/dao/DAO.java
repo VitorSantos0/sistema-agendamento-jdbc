@@ -11,11 +11,12 @@ import conexao.ConexaoDB;
 public class DAO {
 
 	private PreparedStatement stmt = null;
+	private Connection conn = null;
 
 	public ResultSet select(String entidade) {
 		ResultSet rs = null;
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			String query = "SELECT * FROM "+entidade;
 			stmt = conn.prepareStatement(query);
 			LogSql.exibirComandoSql(query);
@@ -32,7 +33,7 @@ public class DAO {
 	public ResultSet select(String entidade, String condicao) {
 		ResultSet rs = null;
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			String query = "SELECT * FROM "+entidade+" WHERE "+condicao;
 			stmt = conn.prepareStatement(query);
 			LogSql.exibirComandoSql(query);
@@ -49,7 +50,7 @@ public class DAO {
 	public ResultSet selectQuery(String query) {
 		ResultSet rs = null;
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			stmt = conn.prepareStatement(query);
 			LogSql.exibirComandoSql(query);
 			rs = stmt.executeQuery();
@@ -64,7 +65,7 @@ public class DAO {
 	
 	public boolean update(String entidade, Map<String, String> dados, int identificador) {
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			StringBuilder setUpdate = new StringBuilder();
 			for (Map.Entry<String, String> entry : dados.entrySet()) {
 	            if (setUpdate.length() > 0) {
@@ -91,7 +92,7 @@ public class DAO {
 	
 	public boolean update(String entidade, Map<String, String> dados, String condicao) {
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			StringBuilder setUpdate = new StringBuilder();
 			for (Map.Entry<String, String> entry : dados.entrySet()) {
 	            if (setUpdate.length() > 0) {
@@ -118,7 +119,7 @@ public class DAO {
 	
 	public boolean insert(String entidade, Map<String, String> dados) {
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			String query = "INSERT INTO "+entidade+" (";
 			StringBuilder campos = new StringBuilder();
 			StringBuilder valores = new StringBuilder();
@@ -146,7 +147,7 @@ public class DAO {
 	
 	public boolean delete(String entidade, int identificador) {
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			String query = "DELETE FROM "+entidade+" WHERE id = "+identificador;
 			LogSql.exibirComandoSql(query);
 			stmt = conn.prepareStatement(query);
@@ -163,7 +164,7 @@ public class DAO {
 	
 	public boolean delete(String entidade, String condicao) {
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			String query = "DELETE FROM "+entidade+" WHERE "+condicao;
 			LogSql.exibirComandoSql(query);
 			stmt = conn.prepareStatement(query);
@@ -181,13 +182,15 @@ public class DAO {
 	public int count(String entidade) {
 		ResultSet rs = null;
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			String query = "SELECT count(id) FROM "+entidade;
 			stmt = conn.prepareStatement(query);
 			LogSql.exibirComandoSql(query);
 			rs = stmt.executeQuery();
-			rs.next();
-			return rs.getInt("count");
+			if(rs.next()) {
+				return rs.getInt("count");
+			}
+			return 0;
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar a query: " + ex);
 		} finally {
@@ -199,13 +202,15 @@ public class DAO {
 	public int count(String entidade, String condicao) {
 		ResultSet rs = null;
 		try {
-			Connection conn = ConexaoDB.getConnection();
+			conn = ConexaoDB.getConnection();
 			String query = "SELECT count(id) FROM "+entidade+" WHERE "+condicao;
 			stmt = conn.prepareStatement(query);
 			LogSql.exibirComandoSql(query);
 			rs = stmt.executeQuery();
-			rs.next();
-			return rs.getInt("count");
+			if(rs.next()) {
+				return rs.getInt("count");
+			}
+			return 0;
 		} catch (SQLException ex) {
 			System.out.println("Não foi possível executar a query: " + ex);
 		} finally {
