@@ -198,14 +198,14 @@ public class AgendamentoServicoPrincipal {
 				System.out.print("Digite uma data válida: ");
 				dataServicoString = sc.nextLine();
 			}
-			LocalDate dataServico = LocalDate.parse(dataServicoString);
+			LocalDate dataServico = LocalDate.parse(dataServicoString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 			System.out.print("Informe a hora do serviço (Exemplo: 08:00): ");
 			String horaServicoString = sc.nextLine();
 			while(!horaValida(horaServicoString)) {
-				System.out.print("Digite uma data válida: ");
+				System.out.print("Digite um horário válido: ");
 				horaServicoString = sc.nextLine();
 			}
-			LocalTime horaServico = LocalTime.parse(horaServicoString);
+			LocalTime horaServico = LocalTime.parse(horaServicoString, DateTimeFormatter.ofPattern("HH:mm"));
 			AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
 			if(agendamentoDAO.countDataHora(dataServico, horaServico) > 0) {
 				System.out.println("Já existe um agendamento cadastrado na mesma data e horário.");
@@ -250,14 +250,14 @@ public class AgendamentoServicoPrincipal {
 						System.out.print("Digite uma "+atributo+" válida: ");
 						valor = sc.nextLine();
 					}
-					LocalDate dataServico = LocalDate.parse(valor);
+					LocalDate dataServico = LocalDate.parse(valor, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 					agendamentoDAO.update(atributos[opcao], dataServico, agendamento.getCodigo());
 				} else if (opcao == 3) {
 					while(!horaValida(valor)) {
 						System.out.print("Digite uma "+atributo+" válida: ");
 						valor = sc.nextLine();
 					}
-					LocalTime horaServico = LocalTime.parse(valor);
+					LocalTime horaServico = LocalTime.parse(valor, DateTimeFormatter.ofPattern("HH:mm"));
 					agendamentoDAO.update(atributos[opcao], horaServico, agendamento.getCodigo());
 				} else {
 					agendamentoDAO.update(atributos[opcao], valor, agendamento.getCodigo());
@@ -501,7 +501,7 @@ public class AgendamentoServicoPrincipal {
 	
 	public static boolean horaValida(String horaString) {
         try {
-            LocalDate.parse(horaString, DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm"));
             return true;
         } catch (DateTimeParseException e) {
             return false;
