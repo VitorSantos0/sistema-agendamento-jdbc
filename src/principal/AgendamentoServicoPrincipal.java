@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -194,14 +193,14 @@ public class AgendamentoServicoPrincipal {
 			String nomeProfissional = sc.nextLine();
 			System.out.print("Informe a data do serviço (Exemplo: 01/01/2025): ");
 			String dataServicoString = sc.nextLine();
-			while(!dataValida(dataServicoString)) {
+			while(!Validacao.dataValida(dataServicoString)) {
 				System.out.print("Digite uma data válida: ");
 				dataServicoString = sc.nextLine();
 			}
 			LocalDate dataServico = LocalDate.parse(dataServicoString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 			System.out.print("Informe a hora do serviço (Exemplo: 08:00): ");
 			String horaServicoString = sc.nextLine();
-			while(!horaValida(horaServicoString)) {
+			while(!Validacao.horaValida(horaServicoString)) {
 				System.out.print("Digite um horário válido: ");
 				horaServicoString = sc.nextLine();
 			}
@@ -246,14 +245,14 @@ public class AgendamentoServicoPrincipal {
 				System.out.print("Informe o(a) novo(a) "+atributo+" do agendamento"+atributoComplemento+": ");
 				String valor = sc.nextLine();
 				if(opcao == 2) {
-					while(!dataValida(valor)) {
+					while(!Validacao.dataValida(valor)) {
 						System.out.print("Digite uma "+atributo+" válida: ");
 						valor = sc.nextLine();
 					}
 					LocalDate dataServico = LocalDate.parse(valor, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 					agendamentoDAO.update(atributos[opcao], dataServico, agendamento.getCodigo());
 				} else if (opcao == 3) {
-					while(!horaValida(valor)) {
+					while(!Validacao.horaValida(valor)) {
 						System.out.print("Digite uma "+atributo+" válida: ");
 						valor = sc.nextLine();
 					}
@@ -411,10 +410,18 @@ public class AgendamentoServicoPrincipal {
 		String nome = sc.nextLine();
 		System.out.print("Informe o CPF do cliente: ");
 		String cpf = sc.nextLine();
+		while(!Validacao.cpfValido(cpf)) {
+			System.out.print("Informe um CPF válido: ");
+			cpf = sc.nextLine();
+		}
 		System.out.print("Informe o endereço do cliente: ");
 		String endereco = sc.nextLine();
-		System.out.print("Informe o telefone do cliente: ");
+		System.out.print("Informe o telefone do cliente (Exemplo: 71988885555): ");
 		String telefone = sc.nextLine();
+		while(!Validacao.telefoneValido(telefone)) {
+			System.out.print("Informe um telefone válido: ");
+			telefone = sc.nextLine();
+		}
 		Cliente cliente = new Cliente(nome, cpf, endereco, telefone);
 		ClienteDAO clienteDAO = new ClienteDAO();
 		clienteDAO.insert(cliente);
@@ -458,6 +465,18 @@ public class AgendamentoServicoPrincipal {
 				String atributo = atributos[opcao];
 				System.out.print("Informe o novo "+atributo+" do cliente: ");
 				String valor = sc.nextLine();
+				if(opcao == 2) {
+					while(!Validacao.cpfValido(valor)) {
+						System.out.print("Informe um CPF válido: ");
+						valor = sc.nextLine();
+					}
+				}
+				if(opcao == 4) {
+					while(!Validacao.telefoneValido(valor)) {
+						System.out.print("Informe um telefone válido: ");
+						valor = sc.nextLine();
+					}
+				}
 				atributo = opcao == 3 ? atributo.replace('ç', 'c') : atributo;
 				clienteDAO.update(atributo, valor, cliente.getCodigo());					
 			}
@@ -488,24 +507,6 @@ public class AgendamentoServicoPrincipal {
 				}
 			}
 		}
-	}
-	
-	public static boolean dataValida(String dateString) {
-        try {
-            LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            return true;
-        } catch (DateTimeParseException e) {
-            return false;
-        }
-    }
-	
-	public static boolean horaValida(String horaString) {
-        try {
-            LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm"));
-            return true;
-        } catch (DateTimeParseException e) {
-            return false;
-        }
 	}
 	
 }
